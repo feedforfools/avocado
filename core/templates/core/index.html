@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero min-h-[60vh]">
+    <div class="hero-content text-center">
+        <div class="max-w-md">
+            <h1 class="text-5xl font-bold">Hello there 🥑</h1>
+            <p class="py-6">
+                Welcome to Avocado. This project runs on Django, HTMX, and DaisyUI.
+            </p>
+            <button
+                class="btn btn-primary"
+                hx-get="/"
+                hx-target="#result"
+                hx-swap="innerHTML transition:true"
+            >
+                Get Started
+            </button>
+            <div id="result" class="mt-6"></div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Django</h2>
+            <p>Server-side rendering, ORM, admin, and batteries included.</p>
+        </div>
+    </div>
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">HTMX</h2>
+            <p>Hypermedia-driven interactions without writing JavaScript.</p>
+        </div>
+    </div>
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">DaisyUI</h2>
+            <p>Beautiful component classes on top of Tailwind CSS.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

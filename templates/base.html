@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="emerald">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Avocado{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body class="min-h-screen bg-base-200">
+    <div class="navbar bg-base-100 shadow-sm">
+        <div class="flex-1">
+            <a href="/" class="btn btn-ghost text-xl">🥑 Avocado</a>
+        </div>
+        <div class="flex-none">
+            {% block nav_actions %}{% endblock %}
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer footer-center p-4 bg-base-300 text-base-content mt-auto">
+        <p>Avocado — Built with Django, HTMX & DaisyUI</p>
+    </footer>
+</body>
+</html>

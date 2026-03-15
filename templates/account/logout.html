@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Sign Out{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[72vh]">
+    <div class="card w-full max-w-sm bg-base-100 shadow-2xl">
+        <div class="card-body items-center text-center gap-4">
+            <div class="bg-warning/15 text-warning rounded-full p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold">{% trans "Sign Out" %}</h1>
+                <p class="text-base-content/60 text-sm mt-1">{% trans "Are you sure you want to sign out?" %}</p>
+            </div>
+            <form method="post" action="{% url 'account_logout' %}" class="w-full">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-error w-full">{% trans "Yes, sign out" %}</button>
+            </form>
+            <a href="/" class="btn btn-ghost btn-sm w-full">{% trans "Cancel" %}</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
