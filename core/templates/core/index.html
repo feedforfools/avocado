@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% block tabs %}
+<div role="tablist" class="tabs tabs-border bg-base-100 px-6">
+    <a role="tab" class="tab tab-active">Dashboard personale</a>
+    <a role="tab" class="tab">Dashboard studio</a>
+    <a role="tab" class="tab">Feed</a>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="hero min-h-[60vh]">
     <div class="hero-content text-center">
