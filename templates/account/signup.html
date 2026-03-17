@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[72vh]">
+    <div class="card w-full max-w-sm bg-base-100 shadow-2xl">
+        <div class="card-body gap-4">
+
+            <div class="text-center mb-2">
+                <h1 class="text-3xl font-bold">{% trans "Create Account" %}</h1>
+                <p class="text-base-content/60 text-sm mt-1">{% trans "Get started for free" %}</p>
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-error">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                    <span>{% for error in form.non_field_errors %}{{ error }}{% endfor %}</span>
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'account_signup' %}" class="flex flex-col gap-3">
+                {% csrf_token %}
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                {% endif %}
+
+                {% for field in form %}
+                    <fieldset class="fieldset p-0">
+                        <legend class="fieldset-legend text-sm font-medium">{{ field.label }}</legend>
+                        <input
+                            type="{{ field.field.widget.input_type }}"
+                            name="{{ field.html_name }}"
+                            id="{{ field.id_for_label }}"
+                            placeholder="{{ field.label }}"
+                            class="input w-full {% if field.errors %}input-error{% endif %}"
+                            {% if field.value %}value="{{ field.value }}"{% endif %}
+                            {% if field.field.required %}required{% endif %}
+                        >
+                        {% for error in field.errors %}
+                            <p class="fieldset-label text-error">{{ error }}</p>
+                        {% endfor %}
+                    </fieldset>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary w-full mt-2">{% trans "Sign Up" %}</button>
+            </form>
+
+            <div class="divider my-0">{% trans "or" %}</div>
+
+            <p class="text-center text-sm">
+                {% blocktrans %}Already have an account? <a href="{{ login_url }}" class="link link-primary font-medium">Sign in</a>{% endblocktrans %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

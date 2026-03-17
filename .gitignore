@@ -1,0 +1,13 @@
+.venv
+__pycache__/
+db.sqlite3
+*.pyc
+.env
+
+_*.md
+
+# Tailwind standalone
+static/css/tailwindcss
+static/css/daisyui.mjs
+static/css/daisyui-theme.mjs
+static/css/output.css
