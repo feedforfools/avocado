@@ -45,9 +45,10 @@ run: css ## Build CSS then start Django dev server
 
 .PHONY: dev
 dev: ## Run Django server + Tailwind watcher in parallel
-	@$(MAKE) css-watch &
-	@$(MANAGE) runserver
-	@trap 'kill %1' EXIT
+	@$(TAILWIND) -i $(CSS_IN) -o $(CSS_OUT) --watch=always & \
+	TAILWIND_PID=$$!; \
+	trap "kill $$TAILWIND_PID 2>/dev/null" EXIT; \
+	$(MANAGE) runserver
 
 .PHONY: css
 css: ## One-shot Tailwind build
@@ -55,7 +56,7 @@ css: ## One-shot Tailwind build
 
 .PHONY: css-watch
 css-watch: ## Tailwind build in watch mode
-	$(TAILWIND) -i $(CSS_IN) -o $(CSS_OUT) --watch
+	$(TAILWIND) -i $(CSS_IN) -o $(CSS_OUT) --watch=always
 
 .PHONY: css-minify
 css-minify: ## Tailwind production build (minified)

@@ -6,3 +6,7 @@
 @source "../../core/templates/**/*.html";
 
 @plugin "./daisyui.mjs";
+
+@theme {
+    --font-sans: "Inter", sans-serif;
+}

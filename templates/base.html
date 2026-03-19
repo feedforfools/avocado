@@ -1,30 +1,66 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" data-theme="emerald">
+<html lang="en" data-theme="emerald" class="bg-base-200">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Avocado{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
     <script defer src="https://unpkg.com/alpinejs@3.14.9/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
-<body class="min-h-screen bg-base-200">
-    <div class="navbar bg-base-100 shadow-sm">
-        <div class="flex-1">
-            <a href="/" class="btn btn-ghost text-xl">🥑 Avocado</a>
+
+<body class="h-screen overflow-hidden bg-base-200" x-data="{ leftSidebarOpen: true, rightSidebarOpen: false }">
+    {% include "partials/sidebar-left.html" %}
+    {% include "partials/sidebar-right.html" %}
+
+    <!-- Body foil: white card floating above the sidebar background, with gap on all sides -->
+    <div
+        class="fixed flex flex-col overflow-hidden bg-base-100"
+        :style="{
+            top:          '0.6rem',
+            bottom:       '0.6rem',
+            right:        rightSidebarOpen ? 'calc(16rem + 0.6rem)' : '0.6rem',
+            left:         leftSidebarOpen ? 'calc(16rem + 0.6rem)' : '0.6rem',
+            borderRadius: '0.75rem',
+            boxShadow:    '-1px 0px 2px 0 rgba(0,0,0,0.10), 1px 0px 2px 0 rgba(0,0,0,0.10)',
+            transition:   'left 0.3s ease, right 0.3s ease'
+        }"
+    >
+        <!-- Foil chrome: toggle button, always accessible -->
+        <div class="flex h-12 shrink-0 items-center gap-3 border-b border-base-200 px-4">
+            <button
+                type="button"
+                class="btn btn-ghost btn-square btn-sm"
+                x-on:click="leftSidebarOpen = !leftSidebarOpen"
+                aria-label="Toggle sidebar"
+            >
+                <iconify-icon icon="lucide:panel-left" width="18" height="18"></iconify-icon>
+            </button>
+            {% block foil_header %}{% endblock %}
+            <button
+                type="button"
+                class="btn btn-ghost btn-square btn-sm ml-auto"
+                x-on:click="rightSidebarOpen = !rightSidebarOpen"
+                aria-label="Toggle right sidebar"
+            >
+                <iconify-icon icon="lucide:search" width="18" height="18"></iconify-icon>
+            </button>
         </div>
-        <div class="flex-none">
-            {% block nav_actions %}{% endblock %}
+
+        <!-- Scrollable content — only this area scrolls -->
+        <div class="flex-1 overflow-y-auto">
+            <main class="container mx-auto w-full px-6 py-6">
+                {% block content %}{% endblock %}
+            </main>
         </div>
     </div>
-
-    <main class="container mx-auto px-4 py-8">
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="footer footer-center p-4 bg-base-300 text-base-content mt-auto">
-        <p>Avocado — Built with Django, HTMX & DaisyUI</p>
-    </footer>
 </body>
 </html>
