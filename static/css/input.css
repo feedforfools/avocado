@@ -7,6 +7,59 @@
 
 @plugin "./daisyui.mjs";
 
+@plugin "./daisyui-theme.mjs" {
+    name: avocado;
+    default: true;
+    color-scheme: light;
+
+    /* Base / Neutral – white canvas */
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(97% 0 0);
+    --color-base-300: oklch(93% 0 0);
+    --color-base-content: oklch(25% 0.02 120);
+
+    /* Primary – Olive Leaf #44501F */
+    --color-primary: oklch(40.88% 0.078 119.65);
+    --color-primary-content: oklch(95% 0.02 119.65);
+
+    /* Secondary – Light Gold #E7D48F */
+    --color-secondary: oklch(87% 0.104 94.59);
+    --color-secondary-content: oklch(30% 0.05 94.59);
+
+    /* Accent – Avocado pit brown */
+    --color-accent: oklch(55% 0.09 44.59);
+    --color-accent-content: oklch(95% 0.02 44.59);
+
+    /* Neutral – dark olive for contrast areas */
+    --color-neutral: oklch(30% 0.03 120);
+    --color-neutral-content: oklch(90% 0.01 120);
+
+    /* Success – Lime Moss #90A93F */
+    --color-success: oklch(69.42% 0.143 119.98);
+    --color-success-content: oklch(20% 0.03 119.98);
+
+    /* Warning – warm amber */
+    --color-warning: oklch(82% 0.17 85);
+    --color-warning-content: oklch(30% 0.06 85);
+
+    /* Error – Dark Walnut #652D14 */
+    --color-error: oklch(36.95% 0.09 44.59);
+    --color-error-content: oklch(92% 0.02 44.59);
+
+    /* Info – standard blue */
+    --color-info: oklch(65% 0.15 240);
+    --color-info-content: oklch(20% 0.03 240);
+
+    --radius-selector: 0.5rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
+}
+
 @theme {
     --font-sans: "Inter", sans-serif;
 }
