@@ -1,0 +1,139 @@
+  <!-- Table -->
+  <input type="hidden" name="sort" value="{{ sort|default:'name' }}">
+  <input type="hidden" name="sort_dir" value="{{ sort_dir|default:'asc' }}">
+  <div class="overflow-x-auto">
+  <table class="table">
+    <thead>
+      <tr class="bg-base-200 text-base-content text-xs [&>th]:py-2">
+        <th class="w-px0">
+          <label>
+            <input
+              type="checkbox"
+              class="checkbox checkbox-sm"
+              x-effect="$el.indeterminate = checked.length > 0 && checked.length < total"
+              :checked="checked.length === total && total > 0"
+              @change="checked = $el.checked ? Array.from({length: total}, (_, i) => i) : []"
+            />
+          </label>
+        </th>
+        <th class="w-px"></th>
+        <th class="cursor-pointer select-none" x-show="columns.name"
+          hx-get="{% url 'core:contacts' %}"
+          hx-target="#contacts-table"
+          hx-include="[name='q'],[name='tab']"
+          hx-vals='{"sort": "name", "sort_dir": "{% if sort == 'name' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"}'
+        >
+          <span class="inline-flex items-center gap-1">
+            Nome
+            {% if sort == 'name' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+          </span>
+        </th>
+        <th class="cursor-pointer select-none" x-show="columns.role"
+          hx-get="{% url 'core:contacts' %}"
+          hx-target="#contacts-table"
+          hx-include="[name='q'],[name='tab']"
+          hx-vals='{"sort": "role", "sort_dir": "{% if sort == 'role' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"}'
+        >
+          <span class="inline-flex items-center gap-1">
+            Ruolo
+            {% if sort == 'role' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+          </span>
+        </th>
+        <th class="cursor-pointer select-none" x-show="columns.address"
+          hx-get="{% url 'core:contacts' %}"
+          hx-target="#contacts-table"
+          hx-include="[name='q'],[name='tab']"
+          hx-vals='{"sort": "address", "sort_dir": "{% if sort == 'address' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"}'
+        >
+          <span class="inline-flex items-center gap-1">
+            Indirizzo
+            {% if sort == 'address' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+          </span>
+        </th>
+        <th class="cursor-pointer select-none" x-show="columns.phone"
+          hx-get="{% url 'core:contacts' %}"
+          hx-target="#contacts-table"
+          hx-include="[name='q'],[name='tab']"
+          hx-vals='{"sort": "phone", "sort_dir": "{% if sort == 'phone' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"}'
+        >
+          <span class="inline-flex items-center gap-1">
+            Telefono
+            {% if sort == 'phone' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+          </span>
+        </th>
+        <th class="cursor-pointer select-none" x-show="columns.email"
+          hx-get="{% url 'core:contacts' %}"
+          hx-target="#contacts-table"
+          hx-include="[name='q'],[name='tab']"
+          hx-vals='{"sort": "email", "sort_dir": "{% if sort == 'email' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}"}'
+        >
+          <span class="inline-flex items-center gap-1">
+            Email
+            {% if sort == 'email' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+          </span>
+        </th>
+        <th class="w-px px-0"></th>
+        <th class="w-px px-0"></th>
+        <th class="w-px px-0 pr-3"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contact in page_obj %}
+      {% include "core/partials/contact_row.html" %}
+      {% empty %}
+      <tr>
+        <td colspan="10" class="text-center py-8 opacity-50">Nessun contatto trovato</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="10" class="font-medium text-xs py-1 border-b border-base-200">
+          <div class="flex items-center gap-2">
+            <span
+              x-show="checked.length > 0"
+              x-transition
+              class=""
+              x-text="checked.length + ' selezionat' + (checked.length === 1 ? 'o' : 'i')"
+            ></span>
+            <span class="ml-auto">{{ page_obj|length }} di {{ page_obj.paginator.count }} contatti</span>
+          </div>
+        </th>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="flex justify-center mt-4">
+    <div class="join">
+      {% if page_obj.has_previous %}
+      <button class="join-item btn btn-sm"
+              hx-get="{% url 'core:contacts' %}?page={{ page_obj.previous_page_number }}"
+              hx-target="#contacts-table"
+              hx-swap="innerHTML"
+              hx-include="[name='q'],[name='tab'],[name='sort'],[name='sort_dir']">&laquo;</button>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+      <button class="join-item btn btn-sm btn-active">{{ num }}</button>
+        {% else %}
+      <button class="join-item btn btn-sm"
+              hx-get="{% url 'core:contacts' %}?page={{ num }}"
+              hx-target="#contacts-table"
+              hx-swap="innerHTML"
+              hx-include="[name='q'],[name='tab'],[name='sort'],[name='sort_dir']">{{ num }}</button>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+      <button class="join-item btn btn-sm"
+              hx-get="{% url 'core:contacts' %}?page={{ page_obj.next_page_number }}"
+              hx-target="#contacts-table"
+              hx-swap="innerHTML"
+              hx-include="[name='q'],[name='tab'],[name='sort'],[name='sort_dir']">&raquo;</button>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}

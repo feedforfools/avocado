@@ -1,10 +1,10 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" data-theme="emerald" class="bg-base-200">
+<html lang="en" data-theme="avocado" class="bg-base-200">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Avocado{% endblock %}</title>
+    <title>{% block title %}{% endblock %}Avocado</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
@@ -14,6 +14,14 @@
     </style>
     <script defer src="https://unpkg.com/alpinejs@3.14.9/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script>
+      document.addEventListener('htmx:configRequest', function(event) {
+        const csrfToken = document.cookie.match(/csrftoken=([^;]+)/);
+        if (csrfToken) {
+          event.detail.headers['X-CSRFToken'] = csrfToken[1];
+        }
+      });
+    </script>
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 
@@ -35,29 +43,35 @@
         }"
     >
         <!-- Foil chrome: toggle button, always accessible -->
-        <div class="flex h-12 shrink-0 items-center gap-3 border-b border-base-200 px-4">
-            <button
-                type="button"
-                class="btn btn-ghost btn-square btn-sm"
-                x-on:click="leftSidebarOpen = !leftSidebarOpen"
-                aria-label="Toggle sidebar"
-            >
-                <iconify-icon icon="lucide:panel-left" width="18" height="18"></iconify-icon>
-            </button>
+        <div class="flex h-12 shrink-0 items-center gap-4 border-b border-base-200 px-2">
+            <div class="flex items-center gap-2">
+                <button
+                    type="button"
+                    class="flex items-center justify-center size-7 rounded hover:bg-base-200 transition-colors"
+                    x-on:click="leftSidebarOpen = !leftSidebarOpen"
+                    aria-label="Toggle sidebar"
+                >
+                    <iconify-icon class="block" icon="lucide:panel-left" width="20" height="20"></iconify-icon>
+                </button>
+                <div class="h-7 w-px bg-base-300"></div>
+            </div>
             {% block foil_header %}{% endblock %}
-            <button
-                type="button"
-                class="btn btn-ghost btn-square btn-sm ml-auto"
-                x-on:click="rightSidebarOpen = !rightSidebarOpen"
-                aria-label="Toggle right sidebar"
-            >
-                <iconify-icon icon="lucide:search" width="18" height="18"></iconify-icon>
-            </button>
+            <div class="ml-auto flex items-center gap-2">
+                <div class="h-7 w-px bg-base-300"></div>
+                <button
+                    type="button"
+                    class="flex items-center justify-center size-7 rounded hover:bg-base-200 transition-colors"
+                    x-on:click="rightSidebarOpen = !rightSidebarOpen"
+                    aria-label="Toggle right sidebar"
+                >
+                    <iconify-icon class="block" icon="noto:avocado" width="20" height="20"></iconify-icon>
+                </button>
+            </div>
         </div>
 
         <!-- Scrollable content — only this area scrolls -->
         <div class="flex-1 overflow-y-auto">
-            <main class="container mx-auto w-full px-6 py-6">
+            <main class="w-full py-2 px-2">
                 {% block content %}{% endblock %}
             </main>
         </div>

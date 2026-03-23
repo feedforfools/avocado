@@ -1,0 +1,55 @@
+<dialog id="contact-form-modal" class="modal">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold" id="contact-form-title">
+      {% if form.instance.pk %}Modifica contatto{% else %}Nuovo contatto{% endif %}
+    </h3>
+    <form
+      id="contact-form"
+      hx-post="{% if form.instance.pk %}{% url 'core:contact_edit' form.instance.pk %}{% else %}{% url 'core:contact_create' %}{% endif %}"
+      hx-target="#contact-modal-container"
+      hx-swap="innerHTML"
+      class="py-4 space-y-3"
+    >
+      {% csrf_token %}
+      <div class="grid grid-cols-2 gap-3">
+        <div class="form-control">
+          <label class="label"><span class="label-text">{{ form.first_name.label }}</span></label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}<p class="text-error text-xs mt-1">{{ form.first_name.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="form-control">
+          <label class="label"><span class="label-text">{{ form.last_name.label }}</span></label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}<p class="text-error text-xs mt-1">{{ form.last_name.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text">{{ form.role.label }}</span></label>
+        {{ form.role }}
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text">{{ form.email.label }}</span></label>
+        {{ form.email }}
+        {% if form.email.errors %}<p class="text-error text-xs mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text">{{ form.phone_number.label }}</span></label>
+        {{ form.phone_number }}
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text">{{ form.address.label }}</span></label>
+        {{ form.address }}
+      </div>
+      <div class="modal-action">
+        <button type="button" class="btn" onclick="document.getElementById('contact-form-modal').close()">Annulla</button>
+        <button type="submit" class="btn btn-primary">
+          {% if form.instance.pk %}Salva{% else %}Crea{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+<script>document.getElementById('contact-form-modal').showModal()</script>

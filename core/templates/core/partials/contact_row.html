@@ -1,0 +1,62 @@
+      <tr
+        id="contact-{{ contact.pk }}"
+        class="group hover:bg-base-200"
+      >
+        <th class="w-px pr-0">
+          <label>
+            <input
+              type="checkbox"
+              class="checkbox checkbox-sm"
+              :checked="checked.includes({{ forloop.counter0 }})"
+              @change="$el.checked ? checked.push({{ forloop.counter0 }}) : (checked = checked.filter(i => i !== {{ forloop.counter0 }}))"
+            />
+          </label>
+        </th>
+        <td class="w-px pl-0 pr-0">
+          <div class="avatar placeholder">
+            <div class="bg-neutral text-white mask mask-circle h-7 w-7 flex items-center justify-center">
+              <span class="text-xs font-bold">{{ contact.initials }}</span>
+            </div>
+          </div>
+        </td>
+        <td class="pl-2" x-show="columns.name">
+            <div class="flex items-center gap-1">
+              <span class="font-bold">{{ contact.last_name }}</span>
+                <span>{{ contact.first_name }}</span>
+            </div>
+        </td>
+        <td x-show="columns.role">
+          <span class="badge badge-sm bg-primary-content text-primary border-none">{{ contact.get_role_display }}</span>
+        </td>
+        <td class="text-sm" x-show="columns.address">{{ contact.address }}</td>
+        <td class="text-sm" x-show="columns.phone">{{ contact.phone_number }}</td>
+        <td class="text-sm" x-show="columns.email">{{ contact.email }}</td>
+        <td class="w-px px-1">
+          <button
+            class="btn btn-ghost btn-xs btn-square {% if contact.favorite %}opacity-100{% else %}opacity-0 group-hover:opacity-100{% endif %} transition-opacity"
+            hx-post="{% url 'core:contact_toggle_favorite' contact.pk %}"
+            hx-target="#contact-{{ contact.pk }}"
+            hx-swap="outerHTML"
+          >
+            <iconify-icon icon="{% if contact.favorite %}fluent:star-16-filled{% else %}fluent:star-16-regular{% endif %}" width="20" height="20" {% if contact.favorite %}class="text-yellow-500"{% endif %}></iconify-icon>
+          </button>
+        </td>
+        <td class="w-px px-1">
+          <button
+            class="btn btn-ghost btn-xs btn-square opacity-0 group-hover:opacity-100 transition-opacity"
+            hx-get="{% url 'core:contact_edit_modal' contact.pk %}"
+            hx-target="#contact-modal-container"
+            hx-swap="innerHTML"
+          >
+            <iconify-icon icon="lucide:square-pen" width="16" height="16"></iconify-icon>
+          </button>
+        </td>
+        <td class="w-px px-1 pr-3">
+          <button
+            class="btn btn-ghost btn-xs btn-square opacity-0 group-hover:opacity-100 transition-opacity"
+            @click="$dispatch('open-delete-modal', { pk: {{ contact.pk }}, name: '{{ contact.first_name }} {{ contact.last_name }}' })"
+          >
+            <iconify-icon icon="lucide:trash-2" width="16" height="16"></iconify-icon>
+          </button>
+        </td>
+      </tr>

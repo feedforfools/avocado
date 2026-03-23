@@ -1,0 +1,39 @@
+<dialog id="delete-modal" class="modal"
+  x-data="{ contactName: '', deleteUrl: '' }"
+  @open-delete-modal.window="
+    contactName = $event.detail.name;
+    deleteUrl = '/contacts/' + $event.detail.pk + '/delete/';
+    $el.showModal();
+  "
+>
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">Conferma eliminazione</h3>
+    <p class="py-4">Eliminare <span x-text="contactName"></span>?</p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn">Annulla</button>
+      </form>
+      <button
+        class="btn btn-error"
+        @click="
+          document.getElementById('delete-modal').close();
+          const params = new URLSearchParams();
+          const q = document.querySelector('[name=q]');
+          const tab = document.querySelector('[name=tab]');
+          const sort = document.querySelector('[name=sort]');
+          const sortDir = document.querySelector('[name=sort_dir]');
+          if (q) params.set('q', q.value);
+          if (tab) params.set('tab', tab.value);
+          if (sort) params.set('sort', sort.value);
+          if (sortDir) params.set('sort_dir', sortDir.value);
+          htmx.ajax('POST', deleteUrl, {target: '#contacts-body', swap: 'innerHTML', values: Object.fromEntries(params)});
+        "
+      >
+        Elimina
+      </button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>

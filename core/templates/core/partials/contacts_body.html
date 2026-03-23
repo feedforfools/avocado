@@ -1,0 +1,25 @@
+<div
+  x-data="{
+    checked: [],
+    total: {{ page_obj|length }},
+    columns: { name: true, role: true, address: true, phone: true, email: true },
+    columnsOpen: false,
+    pendingColumns: {},
+    openColumns() {
+      this.pendingColumns = { ...this.columns };
+      this.columnsOpen = true;
+    },
+    applyColumns() {
+      this.columns = { ...this.pendingColumns };
+      this.columnsOpen = false;
+    },
+    cancelColumns() {
+      this.columnsOpen = false;
+    }
+  }"
+>
+  {% include "core/partials/contacts_toolbar.html" %}
+  <div id="contacts-table">
+    {% include "core/partials/contacts_table.html" %}
+  </div>
+</div>

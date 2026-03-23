@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Contatti | {% endblock %}
+
+{% block foil_header %}
+<div class="flex w-full items-center gap-10">
+    <h1 class="text-lg font-bold">Contatti</h1>
+    <button
+      class="btn btn-primary btn-sm ml-auto"
+      hx-get="{% url 'core:contact_form_modal' %}"
+      hx-target="#contact-modal-container"
+      hx-swap="innerHTML"
+    >
+      Nuovo contatto
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="contacts-body"
+     hx-get="{% url 'core:contacts' %}"
+     hx-trigger="contacts-changed from:body"
+     hx-include="[name='q'],[name='tab'],[name='sort'],[name='sort_dir']"
+     hx-swap="innerHTML">
+    {% include "core/partials/contacts_body.html" %}
+</div>
+<div id="contact-modal-container"></div>
+{% include "core/partials/contact_delete_modal.html" %}
+{% endblock %}

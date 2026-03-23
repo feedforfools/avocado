@@ -5,4 +5,11 @@ app_name = 'core'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('contacts/', views.contacts, name='contacts'),
+    path('contacts/create/', views.contact_create, name='contact_create'),
+    path('contacts/create/modal/', views.contact_form_modal, name='contact_form_modal'),
+    path('contacts/<int:pk>/edit/', views.contact_edit, name='contact_edit'),
+    path('contacts/<int:pk>/edit/modal/', views.contact_form_modal, name='contact_edit_modal'),
+    path('contacts/<int:pk>/toggle-favorite/', views.contact_toggle_favorite, name='contact_toggle_favorite'),
+    path('contacts/<int:pk>/delete/', views.contact_delete, name='contact_delete'),
 ]
