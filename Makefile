@@ -24,7 +24,7 @@ venv: ## Create virtualenv if missing
 .PHONY: deps
 deps: venv ## Install Python dependencies
 	$(PIP) install --upgrade pip
-	$(PIP) install django django-htmx
+	$(PIP) install -r requirements.txt
 
 .PHONY: tailwind-install
 tailwind-install: ## Download Tailwind standalone + DaisyUI bundles
