@@ -78,6 +78,10 @@ superuser: ## Create Django superuser
 makemigrations: ## Generate migration files
 	$(MANAGE) makemigrations
 
+.PHONY: test
+test: ## Run the test suite
+	$(MANAGE) test core --verbosity=2
+
 # ---------------------------------------------------------------------------
 # Housekeeping
 # ---------------------------------------------------------------------------
