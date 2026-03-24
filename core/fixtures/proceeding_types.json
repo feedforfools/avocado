@@ -1,0 +1,186 @@
+[
+  {
+    "model": "core.proceedingtype",
+    "pk": 1,
+    "fields": {
+      "name": "Civile Ordinario",
+      "slug": "civile-ordinario",
+      "description": "Procedimento civile ordinario (rito semplificato ex D.Lgs. 149/2022)",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.proceedingtype",
+    "pk": 2,
+    "fields": {
+      "name": "Lavoro",
+      "slug": "lavoro",
+      "description": "Procedimento in materia di lavoro (rito del lavoro, art. 409 c.p.c.)",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.proceedingtype",
+    "pk": 3,
+    "fields": {
+      "name": "Famiglia",
+      "slug": "famiglia",
+      "description": "Procedimento in materia di famiglia (separazione, divorzio, affidamento)",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.proceedingtype",
+    "pk": 4,
+    "fields": {
+      "name": "Penale",
+      "slug": "penale",
+      "description": "Procedimento penale ordinario (dibattimentale)",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 1,
+    "fields": {
+      "proceeding_type": 1,
+      "label": "Deposito memoria integrativa ex art. 171-ter c.p.c. (n. 1)",
+      "anchor": "first_hearing_date",
+      "offset_days": -40,
+      "reminder_days_before": [7, 3, 1],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 2,
+    "fields": {
+      "proceeding_type": 1,
+      "label": "Deposito memoria integrativa ex art. 171-ter c.p.c. (n. 2)",
+      "anchor": "first_hearing_date",
+      "offset_days": -20,
+      "reminder_days_before": [7, 3, 1],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 3,
+    "fields": {
+      "proceeding_type": 1,
+      "label": "Deposito memoria integrativa ex art. 171-ter c.p.c. (n. 3)",
+      "anchor": "first_hearing_date",
+      "offset_days": -10,
+      "reminder_days_before": [7, 3, 1],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 4,
+    "fields": {
+      "proceeding_type": 1,
+      "label": "Note scritte ex art. 127-ter c.p.c.",
+      "anchor": "first_hearing_date",
+      "offset_days": 30,
+      "reminder_days_before": [7, 3, 1],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 5,
+    "fields": {
+      "proceeding_type": 2,
+      "label": "Deposito memoria difensiva (convenuto)",
+      "anchor": "first_hearing_date",
+      "offset_days": -20,
+      "reminder_days_before": [7, 3, 1],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 6,
+    "fields": {
+      "proceeding_type": 2,
+      "label": "Deposito documenti e richieste istruttorie",
+      "anchor": "first_hearing_date",
+      "offset_days": -5,
+      "reminder_days_before": [7, 3, 1],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 7,
+    "fields": {
+      "proceeding_type": 2,
+      "label": "Deposito note conclusive",
+      "anchor": "first_hearing_date",
+      "offset_days": 30,
+      "reminder_days_before": [14, 7, 3],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 8,
+    "fields": {
+      "proceeding_type": 3,
+      "label": "Deposito memoria integrativa con documenti e istanze istruttorie",
+      "anchor": "first_hearing_date",
+      "offset_days": -30,
+      "reminder_days_before": [14, 7, 3],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 9,
+    "fields": {
+      "proceeding_type": 3,
+      "label": "Deposito replica alla memoria avversaria",
+      "anchor": "first_hearing_date",
+      "offset_days": -15,
+      "reminder_days_before": [7, 3, 1],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 10,
+    "fields": {
+      "proceeding_type": 4,
+      "label": "Deposito lista testi ex art. 468 c.p.p.",
+      "anchor": "first_hearing_date",
+      "offset_days": -7,
+      "reminder_days_before": [7, 3, 1],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 11,
+    "fields": {
+      "proceeding_type": 4,
+      "label": "Deposito memoria difensiva pre-dibattimentale",
+      "anchor": "first_hearing_date",
+      "offset_days": -10,
+      "reminder_days_before": [7, 3, 1],
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.deadlinerule",
+    "pk": 12,
+    "fields": {
+      "proceeding_type": 4,
+      "label": "Deposito motivi nuovi ex art. 585 c.p.p. (appello)",
+      "anchor": "first_hearing_date",
+      "offset_days": -15,
+      "reminder_days_before": [14, 7, 3],
+      "is_active": true
+    }
+  }
+]

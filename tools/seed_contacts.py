@@ -38,7 +38,7 @@ streets = [
     'Via Cavour', 'Via Verdi', 'Via Marconi', 'Via San Marco', 'Via Carducci',
     'Via Battisti', 'Via Oberdan', 'Via Diaz',
 ]
-roles = ['cliente', 'controparte', 'avvocato', 'consulente']
+roles = ['client', 'opposing_party', 'lawyer', 'consultant']
 role_weights = [0.5, 0.25, 0.15, 0.1]
 phone_prefixes = ['340', '347', '328', '333', '349', '338', '320', '345']
 
