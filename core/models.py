@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 class Contact(models.Model):
@@ -14,6 +15,11 @@ class Contact(models.Model):
     phone_number = models.CharField(max_length=20, blank=True)
     address = models.TextField(blank=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='cliente')
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='contacts',
+    )
     favorite = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

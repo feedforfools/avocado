@@ -1,7 +1,13 @@
-"""One-off script to seed 50 random contacts. Run with: python manage.py shell < seed_contacts.py"""
+"""One-off script to seed 50 random contacts. Run with: python manage.py shell < tools/seed_contacts.py"""
 import random
 
+from django.contrib.auth import get_user_model
 from core.models import Contact
+
+User = get_user_model()
+owner = User.objects.filter(is_superuser=True).first() or User.objects.first()
+if owner is None:
+    raise RuntimeError("No users found. Run: python manage.py createsuperuser")
 
 first_names = [
     'Marco', 'Giulia', 'Alessandro', 'Francesca', 'Luca', 'Elena', 'Andrea',
@@ -53,6 +59,7 @@ for _ in range(50):
     contacts.append(Contact(
         first_name=fn, last_name=ln, email=email,
         phone_number=phone, address=addr, role=role, favorite=fav,
+        owner=owner,
     ))
 
 Contact.objects.bulk_create(contacts)
