@@ -5,6 +5,9 @@ app_name = 'core'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('fascicoli/', views.fascicoli, name='fascicoli'),
+    path('fascicoli/create/', views.fascicolo_create, name='fascicolo_create'),
+    path('fascicoli/<int:pk>/', views.fascicolo_detail, name='fascicolo_detail'),
     path('contacts/', views.contacts, name='contacts'),
     path('contacts/create/', views.contact_create, name='contact_create'),
     path('contacts/create/modal/', views.contact_form_modal, name='contact_form_modal'),

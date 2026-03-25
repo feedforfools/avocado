@@ -1,0 +1,36 @@
+<tr
+  id="fascicolo-{{ fascicolo.pk }}"
+  class="group hover:bg-base-200 cursor-pointer"
+  @click="window.location.href='{% url 'core:fascicolo_detail' fascicolo.pk %}'"
+>
+  <td>
+    <div class="font-medium">{{ fascicolo.display_title }}</div>
+    {% if fascicolo.rg_number %}<div class="text-xs opacity-50">RG {{ fascicolo.rg_number }}</div>{% endif %}
+  </td>
+  <td class="text-sm">
+    {% for party in fascicolo.parties.all %}{% if party.role == 'client' %}{{ party.contact.last_name }} {{ party.contact.first_name }}{% endif %}{% endfor %}
+  </td>
+  <td class="text-sm">
+    {% if fascicolo.proceeding_type %}
+    <span class="badge badge-sm bg-primary-content text-primary border-none">{{ fascicolo.proceeding_type.name }}</span>
+    {% else %}
+    <span class="opacity-40">–</span>
+    {% endif %}
+  </td>
+  <td class="text-sm opacity-40">–</td>
+  <td>
+    {% if fascicolo.status == 'active' %}
+    <span class="badge badge-sm badge-success">Attivo</span>
+    {% elif fascicolo.status == 'suspended' %}
+    <span class="badge badge-sm badge-warning">Sospeso</span>
+    {% else %}
+    <span class="badge badge-sm badge-ghost">Archiviato</span>
+    {% endif %}
+  </td>
+  <td class="text-sm">{{ fascicolo.opened_date|date:"d/m/Y" }}</td>
+  <td class="w-px px-1 pr-3" @click.stop>
+    <button class="btn btn-ghost btn-xs btn-square opacity-0 group-hover:opacity-100 transition-opacity">
+      <iconify-icon icon="lucide:ellipsis" width="16" height="16"></iconify-icon>
+    </button>
+  </td>
+</tr>

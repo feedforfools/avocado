@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Fascicoli | {% endblock %}
+
+{% block foil_header %}
+<div class="flex w-full items-center gap-10">
+    <h1 class="text-lg font-bold">Fascicoli</h1>
+    <a
+      class="btn btn-primary btn-sm ml-auto gap-1"
+      href="{% url 'core:fascicolo_create' %}"
+    >
+      <iconify-icon icon="lucide:plus" width="16" height="16"></iconify-icon>
+      Nuovo fascicolo
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="fascicoli-body"
+     hx-get="{% url 'core:fascicoli' %}"
+     hx-trigger="fascicoli-changed from:body"
+     hx-include="[name='q'],[name='tab'],[name='sort'],[name='sort_dir']"
+     hx-swap="innerHTML">
+    {% include "core/partials/fascicoli_body.html" %}
+</div>
+{% endblock %}

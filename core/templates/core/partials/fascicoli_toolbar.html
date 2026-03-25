@@ -1,0 +1,50 @@
+<!-- Toolbar -->
+<div class="flex items-center justify-between mb-2 gap-4">
+  <!-- Left: Status tabs -->
+  <div role="tablist" class="tabs tabs-box tabs-sm">
+    <button role="tab" class="tab {% if active_tab == 'attivi' %}tab-active{% endif %}"
+      hx-get="{% url 'core:fascicoli' %}"
+      hx-target="#fascicoli-body"
+      hx-include="[name='q'],[name='sort'],[name='sort_dir']"
+      hx-vals='{"tab": "attivi"}'
+    >Attivi</button>
+    <button role="tab" class="tab {% if active_tab == 'sospesi' %}tab-active{% endif %}"
+      hx-get="{% url 'core:fascicoli' %}"
+      hx-target="#fascicoli-body"
+      hx-include="[name='q'],[name='sort'],[name='sort_dir']"
+      hx-vals='{"tab": "sospesi"}'
+    >Sospesi</button>
+    <button role="tab" class="tab {% if active_tab == 'archiviati' %}tab-active{% endif %}"
+      hx-get="{% url 'core:fascicoli' %}"
+      hx-target="#fascicoli-body"
+      hx-include="[name='q'],[name='sort'],[name='sort_dir']"
+      hx-vals='{"tab": "archiviati"}'
+    >Archiviati</button>
+    <button role="tab" class="tab {% if active_tab == 'tutti' %}tab-active{% endif %}"
+      hx-get="{% url 'core:fascicoli' %}"
+      hx-target="#fascicoli-body"
+      hx-include="[name='q'],[name='sort'],[name='sort_dir']"
+      hx-vals='{"tab": "tutti"}'
+    >Tutti</button>
+  </div>
+
+  <!-- Right: Search -->
+  <div class="flex items-center gap-2">
+    <input type="hidden" name="tab" value="{{ active_tab|default:'attivi' }}">
+    <label class="input input-bordered input-sm flex items-center gap-2 w-72" x-data="{ q: '{{ search_query }}' }">
+      <input type="text" name="q" class="grow" placeholder="Cerca per nome, cliente, RG..."
+        x-ref="searchInput"
+        x-model="q"
+        hx-get="{% url 'core:fascicoli' %}"
+        hx-trigger="input changed delay:500ms, search"
+        hx-target="#fascicoli-table"
+        hx-include="[name='tab'],[name='sort'],[name='sort_dir']"
+      />
+      <button type="button" class="flex items-center cursor-pointer opacity-50 hover:opacity-100" x-show="q.length > 0" x-cloak
+        @click="q = ''; $nextTick(() => htmx.trigger($refs.searchInput, 'search'))">
+        <iconify-icon icon="lucide:x" width="16" height="16"></iconify-icon>
+      </button>
+      <iconify-icon x-show="q.length === 0" icon="lucide:search" width="16" height="16" class="opacity-50"></iconify-icon>
+    </label>
+  </div>
+</div>

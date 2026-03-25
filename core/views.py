@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import OuterRef, Q, Subquery
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import Contact
+from .models import Contact, Fascicolo, FascicoloParty
 from .forms import ContactForm
 
 @login_required
@@ -130,3 +130,100 @@ def contact_edit(request, pk):
         form.save()
         return HttpResponse(headers={'HX-Trigger': 'contacts-changed'})
     return render(request, 'core/partials/contact_form_modal.html', {'form': form})
+
+
+# ---------------------------------------------------------------------------
+# Fascicoli
+# ---------------------------------------------------------------------------
+
+FASCICOLO_SORT_FIELDS = {
+    'title': ('auto_title',),
+    'client': ('client_last_name',),
+    'opened_date': ('opened_date',),
+    'status': ('status',),
+    'proceeding_type': ('proceeding_type__name',),
+}
+
+_CLIENT_LAST_NAME_SQ = Subquery(
+    FascicoloParty.objects.filter(fascicolo=OuterRef('pk'), role='client')
+    .values('contact__last_name')[:1]
+)
+
+
+def _filtered_fascicoli(user, q='', tab='attivi', sort='opened_date', sort_dir='desc'):
+    qs = (
+        Fascicolo.objects.filter(owner=user)
+        .select_related('proceeding_type')
+        .prefetch_related('parties__contact')
+        .annotate(client_last_name=_CLIENT_LAST_NAME_SQ)
+    )
+    if tab == 'attivi':
+        qs = qs.filter(status='active')
+    elif tab == 'sospesi':
+        qs = qs.filter(status='suspended')
+    elif tab == 'archiviati':
+        qs = qs.filter(status='archived')
+    # tab == 'tutti': no status filter
+    if q:
+        qs = qs.filter(
+            Q(auto_title__icontains=q)
+            | Q(custom_title__icontains=q)
+            | Q(rg_number__icontains=q)
+            | Q(parties__contact__last_name__icontains=q)
+            | Q(parties__contact__first_name__icontains=q)
+        ).distinct()
+    fields = FASCICOLO_SORT_FIELDS.get(sort, FASCICOLO_SORT_FIELDS['opened_date'])
+    if sort_dir == 'desc':
+        fields = tuple(f'-{f}' for f in fields)
+    return qs.order_by(*fields)
+
+
+def _fascicoli_ctx(request):
+    q = (request.POST.get('q') or request.GET.get('q', '')).strip()
+    tab = request.POST.get('tab') or request.GET.get('tab', 'attivi')
+    sort = request.POST.get('sort') or request.GET.get('sort', 'opened_date')
+    sort_dir = request.POST.get('sort_dir') or request.GET.get('sort_dir', 'desc')
+    qs = _filtered_fascicoli(request.user, q, tab, sort, sort_dir)
+    paginator = Paginator(qs, 15)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    return {
+        'page_obj': page_obj,
+        'search_query': q,
+        'active_tab': tab,
+        'sort': sort,
+        'sort_dir': sort_dir,
+    }
+
+
+@login_required
+@ensure_csrf_cookie
+def fascicoli(request):
+    ctx = _fascicoli_ctx(request)
+    if request.htmx:
+        template = (
+            'core/partials/fascicoli_table.html'
+            if request.htmx.target == 'fascicoli-table'
+            else 'core/partials/fascicoli_body.html'
+        )
+        return render(request, template, ctx)
+    return render(request, 'core/fascicoli.html', ctx)
+
+
+@login_required
+def fascicolo_detail(request, pk):
+    # Stub — full detail page is the next sprint.
+    fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
+    return HttpResponse(
+        f'<p style="font-family:sans-serif;padding:2rem">← <a href="/fascicoli/">Fascicoli</a> &nbsp;|&nbsp; '
+        f'<strong>{fascicolo.display_title}</strong> — dettaglio in arrivo.</p>'
+    )
+
+
+@login_required
+def fascicolo_create(request):
+    # Stub — create form is the next sprint.
+    return HttpResponse(
+        '<p style="font-family:sans-serif;padding:2rem">'
+        '← <a href="/fascicoli/">Fascicoli</a> &nbsp;|&nbsp; Nuovo fascicolo — in arrivo.</p>'
+    )

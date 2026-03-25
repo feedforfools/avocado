@@ -213,7 +213,12 @@ class Fascicolo(models.Model):
         update_fields: Iterable[str] | None = None,
     ) -> None:
         self.auto_title = self._compute_auto_title_value()
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
     def refresh_auto_title(self) -> None:
         """Recompute and persist auto_title after related parties change.
@@ -270,7 +275,12 @@ class FascicoloParty(models.Model):
         using: str | None = None,
         update_fields: Iterable[str] | None = None,
     ) -> None:
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
         self.fascicolo.refresh_auto_title()
 
     def delete(
@@ -279,6 +289,6 @@ class FascicoloParty(models.Model):
         keep_parents: bool = False,
     ) -> tuple[int, dict[str, int]]:
         fascicolo = self.fascicolo
-        result = super().delete(using, keep_parents)
+        result = super().delete(using=using, keep_parents=keep_parents)
         fascicolo.refresh_auto_title()
         return result

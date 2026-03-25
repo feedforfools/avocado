@@ -1,0 +1,120 @@
+<!-- Table -->
+<input type="hidden" name="sort" value="{{ sort|default:'opened_date' }}">
+<input type="hidden" name="sort_dir" value="{{ sort_dir|default:'desc' }}">
+<div class="overflow-x-auto">
+<table class="table">
+  <thead>
+    <tr class="bg-base-200 text-base-content text-xs [&>th]:py-2">
+      <th class="cursor-pointer select-none"
+        hx-get="{% url 'core:fascicoli' %}"
+        hx-target="#fascicoli-table"
+        hx-include="[name='q'],[name='tab']"
+        hx-vals='{"sort": "title", "sort_dir": "{% if sort == "title" and sort_dir == "asc" %}desc{% else %}asc{% endif %}"}'
+      >
+        <span class="inline-flex items-center gap-1">
+          Titolo
+          {% if sort == 'title' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+        </span>
+      </th>
+      <th class="cursor-pointer select-none"
+        hx-get="{% url 'core:fascicoli' %}"
+        hx-target="#fascicoli-table"
+        hx-include="[name='q'],[name='tab']"
+        hx-vals='{"sort": "client", "sort_dir": "{% if sort == "client" and sort_dir == "asc" %}desc{% else %}asc{% endif %}"}'
+      >
+        <span class="inline-flex items-center gap-1">
+          Cliente
+          {% if sort == 'client' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+        </span>
+      </th>
+      <th class="cursor-pointer select-none"
+        hx-get="{% url 'core:fascicoli' %}"
+        hx-target="#fascicoli-table"
+        hx-include="[name='q'],[name='tab']"
+        hx-vals='{"sort": "proceeding_type", "sort_dir": "{% if sort == "proceeding_type" and sort_dir == "asc" %}desc{% else %}asc{% endif %}"}'
+      >
+        <span class="inline-flex items-center gap-1">
+          Tipo procedimento
+          {% if sort == 'proceeding_type' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+        </span>
+      </th>
+      <th>Prossima scadenza</th>
+      <th class="cursor-pointer select-none"
+        hx-get="{% url 'core:fascicoli' %}"
+        hx-target="#fascicoli-table"
+        hx-include="[name='q'],[name='tab']"
+        hx-vals='{"sort": "status", "sort_dir": "{% if sort == "status" and sort_dir == "asc" %}desc{% else %}asc{% endif %}"}'
+      >
+        <span class="inline-flex items-center gap-1">
+          Stato
+          {% if sort == 'status' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+        </span>
+      </th>
+      <th class="cursor-pointer select-none"
+        hx-get="{% url 'core:fascicoli' %}"
+        hx-target="#fascicoli-table"
+        hx-include="[name='q'],[name='tab']"
+        hx-vals='{"sort": "opened_date", "sort_dir": "{% if sort == "opened_date" and sort_dir == "asc" %}desc{% else %}asc{% endif %}"}'
+      >
+        <span class="inline-flex items-center gap-1">
+          Apertura
+          {% if sort == 'opened_date' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
+        </span>
+      </th>
+      <th class="w-px px-0 pr-3"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for fascicolo in page_obj %}
+    {% include "core/partials/fascicolo_row.html" %}
+    {% empty %}
+    <tr>
+      <td colspan="7" class="text-center py-8 opacity-50">Nessun fascicolo trovato</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th colspan="7" class="font-medium text-xs py-1 border-b border-base-200">
+        <div class="flex items-center">
+          <span class="ml-auto">{{ page_obj|length }} di {{ page_obj.paginator.count }} fascicoli</span>
+        </div>
+      </th>
+    </tr>
+  </tfoot>
+</table>
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="flex justify-center mt-4">
+  <div class="join">
+    {% if page_obj.has_previous %}
+    <button class="join-item btn btn-sm"
+            hx-get="{% url 'core:fascicoli' %}?page={{ page_obj.previous_page_number }}"
+            hx-target="#fascicoli-table"
+            hx-swap="innerHTML"
+            hx-include="[name='q'],[name='tab'],[name='sort'],[name='sort_dir']">&laquo;</button>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+    <button class="join-item btn btn-sm btn-active">{{ num }}</button>
+      {% else %}
+    <button class="join-item btn btn-sm"
+            hx-get="{% url 'core:fascicoli' %}?page={{ num }}"
+            hx-target="#fascicoli-table"
+            hx-swap="innerHTML"
+            hx-include="[name='q'],[name='tab'],[name='sort'],[name='sort_dir']">{{ num }}</button>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <button class="join-item btn btn-sm"
+            hx-get="{% url 'core:fascicoli' %}?page={{ page_obj.next_page_number }}"
+            hx-target="#fascicoli-table"
+            hx-swap="innerHTML"
+            hx-include="[name='q'],[name='tab'],[name='sort'],[name='sort_dir']">&raquo;</button>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

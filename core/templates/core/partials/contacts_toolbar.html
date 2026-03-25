@@ -45,7 +45,7 @@
           x-ref="searchInput"
           x-model="q"
           hx-get="{% url 'core:contacts' %}"
-          hx-trigger="input changed delay:300ms, search"
+          hx-trigger="input changed delay:500ms, search"
           hx-target="#contacts-table"
           hx-include="[name='tab'],[name='sort'],[name='sort_dir']"
         />

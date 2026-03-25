@@ -1,0 +1,6 @@
+<div x-data="{ total: {{ page_obj|length }} }">
+  {% include "core/partials/fascicoli_toolbar.html" %}
+  <div id="fascicoli-table">
+    {% include "core/partials/fascicoli_table.html" %}
+  </div>
+</div>
