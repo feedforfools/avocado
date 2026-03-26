@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import OuterRef, Q, Subquery
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Contact, Fascicolo, FascicoloParty
-from .forms import ContactForm
+from .forms import ContactForm, FascicoloCreateForm
 
 @login_required
 def index(request):
@@ -222,8 +223,37 @@ def fascicolo_detail(request, pk):
 
 @login_required
 def fascicolo_create(request):
-    # Stub — create form is the next sprint.
-    return HttpResponse(
-        '<p style="font-family:sans-serif;padding:2rem">'
-        '← <a href="/fascicoli/">Fascicoli</a> &nbsp;|&nbsp; Nuovo fascicolo — in arrivo.</p>'
-    )
+    if request.method == 'POST':
+        form = FascicoloCreateForm(request.POST, user=request.user)
+        if form.is_valid():
+            cd = form.cleaned_data
+            with transaction.atomic():
+                fascicolo = Fascicolo.objects.create(
+                    rg_number=cd['rg_number'],
+                    court=cd['court'],
+                    proceeding_type=cd['proceeding_type'],
+                    status=cd['status'],
+                    opened_date=cd['opened_date'],
+                    first_hearing_date=cd['first_hearing_date'],
+                    custom_title=cd['custom_title'],
+                    notes=cd['notes'],
+                    owner=request.user,
+                )
+                if cd.get('client_contact'):
+                    FascicoloParty.objects.create(
+                        fascicolo=fascicolo,
+                        contact=cd['client_contact'],
+                        role='client',
+                    )
+                if cd.get('opposing_party_contact'):
+                    FascicoloParty.objects.create(
+                        fascicolo=fascicolo,
+                        contact=cd['opposing_party_contact'],
+                        role='opposing_party',
+                    )
+                # auto_title depends on parties — recompute after parties are saved
+                fascicolo.refresh_auto_title()
+            return redirect('core:fascicolo_detail', pk=fascicolo.pk)
+    else:
+        form = FascicoloCreateForm(user=request.user)
+    return render(request, 'core/fascicolo_create.html', {'form': form})

@@ -1,0 +1,160 @@
+{% comment %}
+  Searchable contact picker — Alpine.js + DaisyUI.
+
+  Required context variables (use {% include ... with ... only %}):
+    picker_field    — BoundField from a ModelChoiceField scoped to the user
+    picker_optional — bool; when True shows an "opzionale" badge beside the label
+{% endcomment %}
+{% with choices=picker_field.field.choices current_val=picker_field.value empty_lbl=picker_field.field.empty_label %}
+<div
+  class="form-control"
+  x-data="{
+    open: false,
+    search: '',
+    selectedId: '{{ current_val|default:'' }}',
+    selectedLabel: '',
+    options: [{% for val, lbl in choices %}{% if val %}{ id: '{{ val }}', label: '{{ lbl|escapejs }}' },{% endif %}{% endfor %}],
+    get filtered() {
+      if (!this.search) return this.options;
+      const q = this.search.toLowerCase();
+      return this.options.filter(o => o.label.toLowerCase().includes(q));
+    },
+    select(id, label) {
+      this.selectedId = id;
+      this.selectedLabel = label;
+      this.open = false;
+      this.search = '';
+      this.$refs.trigger.focus();
+    },
+    init() {
+      if (this.selectedId) {
+        const found = this.options.find(o => String(o.id) === String(this.selectedId));
+        if (found) this.selectedLabel = found.label;
+      }
+    }
+  }"
+  @click.outside="open = false"
+  @keydown.escape="open = false; $refs.trigger.focus()"
+>
+  <label class="label pb-1">
+    <span class="label-text font-medium">{{ picker_field.label }}</span>
+    {% if picker_optional %}<span class="label-text-alt text-base-content/50">opzionale</span>{% endif %}
+  </label>
+
+  {# Hidden input carries the selected PK to the form POST — same as a <select> would #}
+  <input type="hidden" name="{{ picker_field.html_name }}" :value="selectedId">
+
+  <div class="relative">
+
+    {# ── Trigger ──────────────────────────────────────────────────────── #}
+    <button
+      type="button"
+      x-ref="trigger"
+      @click="open = !open; $nextTick(() => { if (open && $refs.searchInput) $refs.searchInput.focus() })"
+      class="select select-bordered w-full text-left font-normal flex items-center justify-between gap-2 [background-image:none]"
+      :class="open ? 'select-primary outline-none' : ''"
+      aria-haspopup="listbox"
+      :aria-expanded="open"
+    >
+      <span
+        class="truncate"
+        :class="selectedId ? 'text-base-content' : 'text-base-content/40'"
+        x-text="selectedId ? selectedLabel : '{{ empty_lbl|default:'— Seleziona —'|escapejs }}'"
+      ></span>
+      <iconify-icon
+        icon="lucide:chevrons-up-down"
+        width="14" height="14"
+        class="opacity-40 shrink-0"
+        :class="open ? 'opacity-70' : ''"
+      ></iconify-icon>
+    </button>
+
+    {# ── Dropdown panel ───────────────────────────────────────────────── #}
+    <div
+      x-show="open"
+      x-transition:enter="transition ease-out duration-100"
+      x-transition:enter-start="opacity-0 -translate-y-1 scale-95"
+      x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+      x-transition:leave="transition ease-in duration-75"
+      x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+      x-transition:leave-end="opacity-0 -translate-y-1 scale-95"
+      class="absolute z-50 w-full mt-1 bg-base-100 border border-base-300 rounded-box shadow-lg overflow-hidden"
+      style="display:none"
+      role="listbox"
+    >
+      {# ── Search input ──────────────────────────────────────────────── #}
+      <div class="p-2 border-b border-base-200">
+        <label class="input input-sm input-bordered flex items-center gap-1.5 w-full">
+          <iconify-icon icon="lucide:search" width="13" height="13" class="opacity-40 shrink-0"></iconify-icon>
+          <input
+            type="text"
+            x-model="search"
+            x-ref="searchInput"
+            placeholder="Cerca contatto..."
+            class="grow min-w-0 bg-transparent"
+            autocomplete="off"
+            @keydown.enter.prevent
+          >
+          <button
+            type="button"
+            x-show="search"
+            x-cloak
+            @click="search = ''; $refs.searchInput.focus()"
+            class="opacity-50 hover:opacity-100 transition-opacity"
+            tabindex="-1"
+          >
+            <iconify-icon icon="lucide:x" width="12" height="12"></iconify-icon>
+          </button>
+        </label>
+      </div>
+
+      {# ── Options list ─────────────────────────────────────────────── #}
+      <ul class="max-h-52 overflow-y-auto py-1">
+
+        {# Clear / empty option #}
+        <li>
+          <button
+            type="button"
+            @click="select('', '')"
+            class="w-full text-left px-3 py-2 text-sm italic text-base-content/40 hover:bg-base-200 transition-colors"
+            :class="{ 'bg-base-200': !selectedId }"
+          >{{ empty_lbl|default:'— Seleziona —' }}</button>
+        </li>
+
+        {# Filtered contacts #}
+        <template x-for="opt in filtered" :key="opt.id">
+          <li>
+            <button
+              type="button"
+              @click="select(opt.id, opt.label)"
+              class="w-full text-left px-3 py-2 text-sm hover:bg-base-200 transition-colors"
+              :class="{ 'bg-primary/10 text-primary font-semibold': String(selectedId) === String(opt.id) }"
+              x-text="opt.label"
+            ></button>
+          </li>
+        </template>
+
+        {# No contacts at all #}
+        <li x-show="options.length === 0" class="px-3 py-5 text-sm text-center text-base-content/40">
+          Nessun contatto in rubrica. <a href="{% url 'core:contacts' %}" class="link link-primary" @click.stop>Aggiungi un contatto →</a>
+        </li>
+
+        {# Search returned nothing #}
+        <li
+          x-show="options.length > 0 && filtered.length === 0 && search"
+          class="px-3 py-5 text-sm text-center text-base-content/40"
+        >
+          Nessun risultato per &ldquo;<span x-text="search" class="font-medium"></span>&rdquo;
+        </li>
+
+      </ul>
+    </div>
+
+  </div>
+
+  {% if picker_field.errors %}
+    <p class="text-error text-xs mt-1">{{ picker_field.errors.0 }}</p>
+  {% endif %}
+
+</div>
+{% endwith %}

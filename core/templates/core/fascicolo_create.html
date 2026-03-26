@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Nuovo fascicolo | {% endblock %}
+
+{% block foil_header %}
+<div class="flex w-full items-center gap-3">
+  <a href="{% url 'core:fascicoli' %}"
+     class="flex items-center gap-1 text-sm text-base-content/60 hover:text-base-content transition-colors">
+    <iconify-icon icon="lucide:chevron-left" width="16" height="16"></iconify-icon>
+    Fascicoli
+  </a>
+  <div class="h-4 w-px bg-base-300"></div>
+  <span class="text-sm font-medium">Nuovo fascicolo</span>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-6 px-4">
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {# ── Dati procedimento ───────────────────────────────────────────── #}
+    <div class="card bg-base-100 border border-base-200 mb-4">
+      <div class="card-body p-5">
+        <h2 class="card-title text-base mb-4">
+          <iconify-icon icon="lucide:folder-open" width="18" height="18" class="text-primary"></iconify-icon>
+          Dati procedimento
+        </h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="form-control">
+            <label class="label pb-1">
+              <span class="label-text font-medium">{{ form.court.label }}</span>
+            </label>
+            {{ form.court }}
+            {% if form.court.errors %}
+              <p class="text-error text-xs mt-1">{{ form.court.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label pb-1">
+              <span class="label-text font-medium">{{ form.rg_number.label }}</span>
+            </label>
+            {{ form.rg_number }}
+            {% if form.rg_number.errors %}
+              <p class="text-error text-xs mt-1">{{ form.rg_number.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-3">
+          <div class="form-control">
+            <label class="label pb-1">
+              <span class="label-text font-medium">{{ form.proceeding_type.label }}</span>
+            </label>
+            {{ form.proceeding_type }}
+            {% if form.proceeding_type.errors %}
+              <p class="text-error text-xs mt-1">{{ form.proceeding_type.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label pb-1">
+              <span class="label-text font-medium">{{ form.status.label }}</span>
+            </label>
+            {{ form.status }}
+            {% if form.status.errors %}
+              <p class="text-error text-xs mt-1">{{ form.status.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-3">
+          <div class="form-control">
+            <label class="label pb-1">
+              <span class="label-text font-medium">
+                {{ form.opened_date.label }}
+                <span class="text-error ml-0.5">*</span>
+              </span>
+            </label>
+            {{ form.opened_date }}
+            {% if form.opened_date.errors %}
+              <p class="text-error text-xs mt-1">{{ form.opened_date.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label pb-1">
+              <span class="label-text font-medium">{{ form.first_hearing_date.label }}</span>
+              <span class="label-text-alt text-base-content/50">opzionale</span>
+            </label>
+            {{ form.first_hearing_date }}
+            {% if form.first_hearing_date.errors %}
+              <p class="text-error text-xs mt-1">{{ form.first_hearing_date.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Parti ───────────────────────────────────────────────────────── #}
+    <div class="card bg-base-100 border border-base-200 mb-4">
+      <div class="card-body p-5">
+        <h2 class="card-title text-base mb-1">
+          <iconify-icon icon="lucide:users" width="18" height="18" class="text-primary"></iconify-icon>
+          Parti
+        </h2>
+        <p class="text-xs text-base-content/50 mb-4">
+          Seleziona dai tuoi contatti. Parti aggiuntive possono essere collegate dal dettaglio del fascicolo.
+        </p>
+
+        <div class="grid grid-cols-2 gap-4">
+          {% include "core/partials/contact_picker.html" with picker_field=form.client_contact picker_optional=False only %}
+          {% include "core/partials/contact_picker.html" with picker_field=form.opposing_party_contact picker_optional=True only %}
+        </div>
+      </div>
+    </div>
+
+    {# ── Titolo e note ───────────────────────────────────────────────── #}
+    <div class="card bg-base-100 border border-base-200 mb-6">
+      <div class="card-body p-5">
+        <h2 class="card-title text-base mb-4">
+          <iconify-icon icon="lucide:pencil-line" width="18" height="18" class="text-primary"></iconify-icon>
+          Titolo e note
+        </h2>
+
+        <div class="form-control mb-3">
+          <label class="label pb-1">
+            <span class="label-text font-medium">{{ form.custom_title.label }}</span>
+            <span class="label-text-alt text-base-content/50">opzionale</span>
+          </label>
+          {{ form.custom_title }}
+          {% if form.custom_title.errors %}
+            <p class="text-error text-xs mt-1">{{ form.custom_title.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-control">
+          <label class="label pb-1">
+            <span class="label-text font-medium">{{ form.notes.label }}</span>
+            <span class="label-text-alt text-base-content/50">opzionale</span>
+          </label>
+          {{ form.notes }}
+          {% if form.notes.errors %}
+            <p class="text-error text-xs mt-1">{{ form.notes.errors.0 }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# ── Actions ─────────────────────────────────────────────────────── #}
+    <div class="flex items-center justify-end gap-3">
+      <a href="{% url 'core:fascicoli' %}" class="btn btn-ghost">Annulla</a>
+      <button type="submit" class="btn btn-primary gap-1">
+        <iconify-icon icon="lucide:folder-plus" width="16" height="16"></iconify-icon>
+        Crea fascicolo
+      </button>
+    </div>
+
+  </form>
+</div>
+{% endblock %}
