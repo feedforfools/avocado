@@ -3,22 +3,22 @@
   class="group hover:bg-base-200 cursor-pointer"
   @click="window.location.href='{% url 'core:fascicolo_detail' fascicolo.pk %}'"
 >
-  <td>
+  <td x-show="columns.title">
     <div class="font-medium">{{ fascicolo.display_title }}</div>
     {% if fascicolo.rg_number %}<div class="text-xs opacity-50">RG {{ fascicolo.rg_number }}</div>{% endif %}
   </td>
-  <td class="text-sm">
+  <td class="text-sm" x-show="columns.client">
     {% for party in fascicolo.parties.all %}{% if party.role == 'client' %}{{ party.contact.last_name }} {{ party.contact.first_name }}{% endif %}{% endfor %}
   </td>
-  <td class="text-sm">
+  <td class="text-sm" x-show="columns.proceeding_type">
     {% if fascicolo.proceeding_type %}
     <span class="badge badge-sm bg-primary-content text-primary border-none">{{ fascicolo.proceeding_type.name }}</span>
     {% else %}
     <span class="opacity-40">–</span>
     {% endif %}
   </td>
-  <td class="text-sm opacity-40">–</td>
-  <td>
+  <td class="text-sm opacity-40" x-show="columns.prossima_scadenza">–</td>
+  <td x-show="columns.status">
     {% if fascicolo.status == 'active' %}
     <span class="badge badge-sm badge-success">Attivo</span>
     {% elif fascicolo.status == 'suspended' %}
@@ -27,7 +27,15 @@
     <span class="badge badge-sm badge-ghost">Archiviato</span>
     {% endif %}
   </td>
-  <td class="text-sm">{{ fascicolo.opened_date|date:"d/m/Y" }}</td>
+  <td class="text-sm" x-show="columns.opened_date">{{ fascicolo.opened_date|date:"d/m/Y" }}</td>
+  <td class="text-sm" x-show="columns.rg_number">{{ fascicolo.rg_number|default:"–" }}</td>
+  <td class="text-sm" x-show="columns.court">{{ fascicolo.court|default:"–" }}</td>
+  <td class="text-sm" x-show="columns.first_hearing_date">
+    {% if fascicolo.first_hearing_date %}{{ fascicolo.first_hearing_date|date:"d/m/Y" }}{% else %}–{% endif %}
+  </td>
+  <td class="text-sm" x-show="columns.activities">{{ fascicolo.activity_count|default:0 }}</td>
+  <td class="text-sm opacity-40" x-show="columns.scadenze">–</td>
+  <td class="text-sm opacity-40" x-show="columns.documents">–</td>
   <td class="w-px px-1 pr-3" @click.stop>
     <button class="btn btn-ghost btn-xs btn-square opacity-0 group-hover:opacity-100 transition-opacity">
       <iconify-icon icon="lucide:ellipsis" width="16" height="16"></iconify-icon>

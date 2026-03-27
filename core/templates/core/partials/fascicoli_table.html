@@ -5,7 +5,7 @@
 <table class="table">
   <thead>
     <tr class="bg-base-200 text-base-content text-xs [&>th]:py-2">
-      <th class="cursor-pointer select-none"
+      <th class="cursor-pointer select-none" x-show="columns.title"
         hx-get="{% url 'core:fascicoli' %}"
         hx-target="#fascicoli-table"
         hx-include="[name='q'],[name='tab']"
@@ -16,7 +16,7 @@
           {% if sort == 'title' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
         </span>
       </th>
-      <th class="cursor-pointer select-none"
+      <th class="cursor-pointer select-none" x-show="columns.client"
         hx-get="{% url 'core:fascicoli' %}"
         hx-target="#fascicoli-table"
         hx-include="[name='q'],[name='tab']"
@@ -27,7 +27,7 @@
           {% if sort == 'client' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
         </span>
       </th>
-      <th class="cursor-pointer select-none"
+      <th class="cursor-pointer select-none" x-show="columns.proceeding_type"
         hx-get="{% url 'core:fascicoli' %}"
         hx-target="#fascicoli-table"
         hx-include="[name='q'],[name='tab']"
@@ -38,8 +38,8 @@
           {% if sort == 'proceeding_type' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
         </span>
       </th>
-      <th>Prossima scadenza</th>
-      <th class="cursor-pointer select-none"
+      <th x-show="columns.prossima_scadenza">Prossima scadenza</th>
+      <th class="cursor-pointer select-none" x-show="columns.status"
         hx-get="{% url 'core:fascicoli' %}"
         hx-target="#fascicoli-table"
         hx-include="[name='q'],[name='tab']"
@@ -50,7 +50,7 @@
           {% if sort == 'status' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
         </span>
       </th>
-      <th class="cursor-pointer select-none"
+      <th class="cursor-pointer select-none" x-show="columns.opened_date"
         hx-get="{% url 'core:fascicoli' %}"
         hx-target="#fascicoli-table"
         hx-include="[name='q'],[name='tab']"
@@ -61,6 +61,12 @@
           {% if sort == 'opened_date' %}<iconify-icon icon="lucide:arrow-{% if sort_dir == 'asc' %}up{% else %}down{% endif %}" width="14" height="14"></iconify-icon>{% endif %}
         </span>
       </th>
+      <th x-show="columns.rg_number">Numero RG</th>
+      <th x-show="columns.court">Tribunale</th>
+      <th x-show="columns.first_hearing_date">Prima udienza</th>
+      <th x-show="columns.activities">N. attività</th>
+      <th x-show="columns.scadenze">N. scadenze</th>
+      <th x-show="columns.documents">N. documenti</th>
       <th class="w-px px-0 pr-3"></th>
     </tr>
   </thead>
@@ -69,13 +75,13 @@
     {% include "core/partials/fascicolo_row.html" %}
     {% empty %}
     <tr>
-      <td colspan="7" class="text-center py-8 opacity-50">Nessun fascicolo trovato</td>
+      <td colspan="13" class="text-center py-8 opacity-50">Nessun fascicolo trovato</td>
     </tr>
     {% endfor %}
   </tbody>
   <tfoot>
     <tr>
-      <th colspan="7" class="font-medium text-xs py-1 border-b border-base-200">
+      <th colspan="13" class="font-medium text-xs py-1 border-b border-base-200">
         <div class="flex items-center">
           <span class="ml-auto">{{ page_obj|length }} di {{ page_obj.paginator.count }} fascicoli</span>
         </div>

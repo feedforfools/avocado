@@ -1,4 +1,24 @@
-<div x-data="{ total: {{ page_obj|length }} }">
+<div x-data="{
+    columns: {
+      title: true, client: true, proceeding_type: true, prossima_scadenza: true,
+      status: true, opened_date: true,
+      rg_number: false, court: false, first_hearing_date: false,
+      activities: false, scadenze: false, documents: false
+    },
+    columnsOpen: false,
+    pendingColumns: {},
+    openColumns() {
+      this.pendingColumns = { ...this.columns };
+      this.columnsOpen = true;
+    },
+    applyColumns() {
+      this.columns = { ...this.pendingColumns };
+      this.columnsOpen = false;
+    },
+    cancelColumns() {
+      this.columnsOpen = false;
+    }
+  }">
   {% include "core/partials/fascicoli_toolbar.html" %}
   <div id="fascicoli-table">
     {% include "core/partials/fascicoli_table.html" %}

@@ -3,7 +3,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import OuterRef, Q, Subquery
+from django.db.models import Count, OuterRef, Q, Subquery
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Activity, Contact, Fascicolo, FascicoloParty
@@ -150,13 +150,22 @@ _CLIENT_LAST_NAME_SQ = Subquery(
     .values('contact__last_name')[:1]
 )
 
+_ACTIVITY_COUNT_SQ = Subquery(
+    Activity.objects
+    .filter(fascicolo=OuterRef('pk'))
+    .order_by()
+    .values('fascicolo')
+    .annotate(c=Count('pk'))
+    .values('c')[:1]
+)
+
 
 def _filtered_fascicoli(user, q='', tab='attivi', sort='opened_date', sort_dir='desc'):
     qs = (
         Fascicolo.objects.filter(owner=user)
         .select_related('proceeding_type')
         .prefetch_related('parties__contact')
-        .annotate(client_last_name=_CLIENT_LAST_NAME_SQ)
+        .annotate(client_last_name=_CLIENT_LAST_NAME_SQ, activity_count=_ACTIVITY_COUNT_SQ)
     )
     if tab == 'attivi':
         qs = qs.filter(status='active')

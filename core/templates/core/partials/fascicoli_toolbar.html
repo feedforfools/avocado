@@ -28,7 +28,7 @@
     >Tutti</button>
   </div>
 
-  <!-- Right: Search -->
+  <!-- Right: Search + Columns -->
   <div class="flex items-center gap-2">
     <input type="hidden" name="tab" value="{{ active_tab|default:'attivi' }}">
     <label class="input input-bordered input-sm flex items-center gap-2 w-72" x-data="{ q: '{{ search_query }}' }">
@@ -46,5 +46,77 @@
       </button>
       <iconify-icon x-show="q.length === 0" icon="lucide:search" width="16" height="16" class="opacity-50"></iconify-icon>
     </label>
+
+    <!-- Columns dropdown -->
+    <div class="relative">
+      <button class="btn btn-sm gap-1" @click="openColumns()">
+        Colonne
+        <iconify-icon icon="lucide:chevron-down" width="14" height="14"></iconify-icon>
+      </button>
+      <div
+        x-show="columnsOpen"
+        x-cloak
+        @click.outside="cancelColumns()"
+        x-transition
+        class="absolute right-0 top-full mt-1 z-50 bg-base-100 border border-base-300 rounded-lg shadow-lg p-4 w-64"
+      >
+        <h3 class="font-semibold text-sm mb-3">Colonne visibili</h3>
+        <div class="flex flex-col gap-2">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.title" />
+            <span class="text-sm">Titolo</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.client" />
+            <span class="text-sm">Cliente</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.proceeding_type" />
+            <span class="text-sm">Tipo procedimento</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.prossima_scadenza" />
+            <span class="text-sm">Prossima scadenza</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.status" />
+            <span class="text-sm">Stato</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.opened_date" />
+            <span class="text-sm">Data apertura</span>
+          </label>
+          <div class="h-px bg-base-200 my-1"></div>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.rg_number" />
+            <span class="text-sm">Numero RG</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.court" />
+            <span class="text-sm">Tribunale</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.first_hearing_date" />
+            <span class="text-sm">Prima udienza</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.activities" />
+            <span class="text-sm">N. attività</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.scadenze" />
+            <span class="text-sm">N. scadenze</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="checkbox checkbox-sm" x-model="pendingColumns.documents" />
+            <span class="text-sm">N. documenti</span>
+          </label>
+        </div>
+        <div class="flex items-center gap-2 mt-4 justify-end">
+          <button class="btn btn-primary btn-sm" @click="applyColumns()">Aggiorna</button>
+          <button class="btn btn-ghost btn-sm" @click="cancelColumns()">Annulla</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
