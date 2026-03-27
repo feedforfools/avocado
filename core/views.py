@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -6,8 +8,8 @@ from django.db import transaction
 from django.db.models import Count, OuterRef, Q, Subquery
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import Activity, Contact, Fascicolo, FascicoloParty
-from .forms import ActivityForm, ContactForm, FascicoloCreateForm
+from .models import Activity, Contact, Deadline, Fascicolo, FascicoloParty
+from .forms import ActivityForm, ContactForm, DeadlineForm, FascicoloCreateForm
 
 @login_required
 def index(request):
@@ -159,13 +161,34 @@ _ACTIVITY_COUNT_SQ = Subquery(
     .values('c')[:1]
 )
 
+_NEXT_DEADLINE_DATE_SQ = Subquery(
+    Deadline.objects
+    .filter(fascicolo=OuterRef('pk'), is_completed=False)
+    .order_by('due_date')
+    .values('due_date')[:1]
+)
+
+_OPEN_DEADLINE_COUNT_SQ = Subquery(
+    Deadline.objects
+    .filter(fascicolo=OuterRef('pk'), is_completed=False)
+    .order_by()
+    .values('fascicolo')
+    .annotate(c=Count('pk'))
+    .values('c')[:1]
+)
+
 
 def _filtered_fascicoli(user, q='', tab='attivi', sort='opened_date', sort_dir='desc'):
     qs = (
         Fascicolo.objects.filter(owner=user)
         .select_related('proceeding_type')
         .prefetch_related('parties__contact')
-        .annotate(client_last_name=_CLIENT_LAST_NAME_SQ, activity_count=_ACTIVITY_COUNT_SQ)
+        .annotate(
+            client_last_name=_CLIENT_LAST_NAME_SQ,
+            activity_count=_ACTIVITY_COUNT_SQ,
+            next_deadline_date=_NEXT_DEADLINE_DATE_SQ,
+            open_deadline_count=_OPEN_DEADLINE_COUNT_SQ,
+        )
     )
     if tab == 'attivi':
         qs = qs.filter(status='active')
@@ -246,8 +269,25 @@ def fascicolo_detail(request, pk):
         'fascicolo': fascicolo,
         'parties': _sorted_parties(fascicolo),
         'active_tab': 'panoramica',
-        'activity_count': Activity.objects.filter(fascicolo=fascicolo).count(),
+        **_panoramica_ctx(fascicolo),
     })
+
+
+def _panoramica_ctx(fascicolo):
+    """Context data for the Panoramica tab — shared by fascicolo_detail and fascicolo_tab."""
+    today = date.today()
+    return {
+        'activity_count': Activity.objects.filter(fascicolo=fascicolo).count(),
+        'deadline_count': Deadline.objects.filter(fascicolo=fascicolo, is_completed=False).count(),
+        'next_deadline': (
+            Deadline.objects
+            .filter(fascicolo=fascicolo, is_completed=False)
+            .order_by('due_date')
+            .first()
+        ),
+        'today': today,
+        'today_plus_7': today + timedelta(days=7),
+    }
 
 
 @login_required
@@ -262,7 +302,11 @@ def fascicolo_tab(request, pk, tab):
     if tab == 'attivita':
         ctx['activities'] = Activity.objects.filter(fascicolo=fascicolo)
     elif tab == 'panoramica':
-        ctx['activity_count'] = Activity.objects.filter(fascicolo=fascicolo).count()
+        ctx.update(_panoramica_ctx(fascicolo))
+    elif tab == 'scadenze':
+        deadlines_qs = Deadline.objects.filter(fascicolo=fascicolo).order_by('is_completed', 'due_date')
+        ctx['deadlines_template'] = deadlines_qs.filter(source='template')
+        ctx['deadlines_manual'] = deadlines_qs.filter(source='manual')
     return render(request, f'core/partials/fascicolo_tab_{tab}.html', ctx)
 
 
@@ -327,3 +371,43 @@ def fascicolo_create(request):
     else:
         form = FascicoloCreateForm(user=request.user)
     return render(request, 'core/fascicolo_create.html', {'form': form})
+
+
+# ---------------------------------------------------------------------------
+# Scadenze (Deadlines)
+# ---------------------------------------------------------------------------
+
+@login_required
+def deadline_form_modal(request, pk):
+    fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
+    return render(request, 'core/partials/deadline_form_modal.html', {
+        'fascicolo': fascicolo,
+        'form': DeadlineForm(),
+    })
+
+
+@login_required
+@require_POST
+def deadline_create(request, pk):
+    fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
+    form = DeadlineForm(request.POST)
+    if form.is_valid():
+        deadline = form.save(commit=False)
+        deadline.fascicolo = fascicolo
+        deadline.source = 'manual'
+        deadline.save()
+        return HttpResponse(headers={'HX-Trigger': 'deadlineChanged'})
+    return render(request, 'core/partials/deadline_form_modal.html', {
+        'fascicolo': fascicolo,
+        'form': form,
+    })
+
+
+@login_required
+@require_POST
+def deadline_toggle_complete(request, pk, deadline_pk):
+    fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
+    deadline = get_object_or_404(Deadline, pk=deadline_pk, fascicolo=fascicolo)
+    deadline.is_completed = not deadline.is_completed
+    deadline.save(update_fields=['is_completed', 'updated_at'])
+    return HttpResponse(headers={'HX-Trigger': 'deadlineChanged'})

@@ -1,0 +1,70 @@
+<dialog id="deadline-form-modal" class="modal">
+  <div class="modal-box max-w-lg">
+
+    {# ── Header ── #}
+    <div class="flex items-center gap-2 mb-5">
+      <iconify-icon icon="lucide:calendar-clock" width="18" height="18" class="text-primary"></iconify-icon>
+      <h3 class="text-base font-semibold">Nuova scadenza</h3>
+    </div>
+
+    <form
+      id="deadline-form"
+      hx-post="{% url 'core:deadline_create' fascicolo.pk %}"
+      hx-target="#deadline-modal-container"
+      hx-swap="innerHTML"
+      class="space-y-4"
+    >
+      {% csrf_token %}
+
+      <div class="form-control">
+        <label class="label pb-1">
+          <span class="label-text font-medium">
+            {{ form.label.label }}<span class="text-error ml-0.5">*</span>
+          </span>
+        </label>
+        {{ form.label }}
+        {% if form.label.errors %}
+          <p class="text-error text-xs mt-1">{{ form.label.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="form-control">
+        <label class="label pb-1">
+          <span class="label-text font-medium">
+            {{ form.due_date.label }}<span class="text-error ml-0.5">*</span>
+          </span>
+        </label>
+        {{ form.due_date }}
+        {% if form.due_date.errors %}
+          <p class="text-error text-xs mt-1">{{ form.due_date.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="form-control">
+        <label class="label pb-1">
+          <span class="label-text font-medium">{{ form.notes.label }}</span>
+          <span class="label-text-alt text-base-content/50">opzionale</span>
+        </label>
+        {{ form.notes }}
+        {% if form.notes.errors %}
+          <p class="text-error text-xs mt-1">{{ form.notes.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      {# ── Actions ── #}
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button type="button" class="btn btn-ghost"
+                onclick="document.getElementById('deadline-form-modal').close()">Annulla</button>
+        <button type="submit" class="btn btn-primary gap-1">
+          <iconify-icon icon="lucide:plus" width="16" height="16"></iconify-icon>
+          Aggiungi
+        </button>
+      </div>
+
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+<script>document.getElementById('deadline-form-modal').showModal()</script>

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from datetime import date
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -340,3 +341,51 @@ class Activity(models.Model):
 
     def __str__(self) -> str:
         return f"{self.get_activity_type_display()} – {self.date}"  # type: ignore[attr-defined]
+
+
+class Deadline(models.Model):
+    """A single deadline on a Fascicolo — manual, rule-computed, or AI-extracted.
+
+    source is non-nullable with no default so callers must always be explicit
+    about where the deadline came from.  The urgency property is used by
+    templates for colour-coding.
+    """
+
+    SOURCE_CHOICES = [
+        ('manual', 'Manuale'),
+        ('template', 'Da tipo procedimento'),
+        ('extracted', 'Estratta da atto'),
+    ]
+
+    fascicolo = models.ForeignKey(
+        Fascicolo,
+        on_delete=models.CASCADE,
+        related_name='deadlines',
+    )
+    label = models.CharField('Descrizione', max_length=200)
+    due_date = models.DateField('Data scadenza')
+    source = models.CharField('Origine', max_length=10, choices=SOURCE_CHOICES)
+    is_completed = models.BooleanField('Completata', default=False)
+    notes = models.TextField('Note', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['is_completed', 'due_date']
+        verbose_name = 'Scadenza'
+        verbose_name_plural = 'Scadenze'
+
+    def __str__(self) -> str:
+        return f"{self.label} ({self.due_date})"
+
+    @property
+    def urgency(self) -> str:
+        """Colour-coding signal for templates: overdue | soon | ok | completed."""
+        if self.is_completed:
+            return 'completed'
+        today = date.today()
+        if self.due_date < today:
+            return 'overdue'
+        if (self.due_date - today).days <= 7:
+            return 'soon'
+        return 'ok'

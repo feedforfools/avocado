@@ -17,7 +17,19 @@
     <span class="opacity-40">–</span>
     {% endif %}
   </td>
-  <td class="text-sm opacity-40" x-show="columns.prossima_scadenza">–</td>
+  <td class="text-sm" x-show="columns.prossima_scadenza">
+    {% if fascicolo.next_deadline_date %}
+      {% if fascicolo.next_deadline_date < today %}
+        <span class="badge badge-error badge-sm whitespace-nowrap">{{ fascicolo.next_deadline_date|date:"d/m/Y" }}</span>
+      {% elif fascicolo.next_deadline_date <= today_plus_7 %}
+        <span class="badge badge-warning badge-sm whitespace-nowrap">{{ fascicolo.next_deadline_date|date:"d/m/Y" }}</span>
+      {% else %}
+        <span class="badge badge-success badge-sm whitespace-nowrap">{{ fascicolo.next_deadline_date|date:"d/m/Y" }}</span>
+      {% endif %}
+    {% else %}
+      <span class="opacity-40">–</span>
+    {% endif %}
+  </td>
   <td x-show="columns.status">
     {% if fascicolo.status == 'active' %}
     <span class="badge badge-sm badge-success">Attivo</span>
@@ -34,7 +46,13 @@
     {% if fascicolo.first_hearing_date %}{{ fascicolo.first_hearing_date|date:"d/m/Y" }}{% else %}–{% endif %}
   </td>
   <td class="text-sm" x-show="columns.activities">{{ fascicolo.activity_count|default:0 }}</td>
-  <td class="text-sm opacity-40" x-show="columns.scadenze">–</td>
+  <td class="text-sm" x-show="columns.scadenze">
+    {% if fascicolo.open_deadline_count %}
+      {{ fascicolo.open_deadline_count }}
+    {% else %}
+      <span class="opacity-40">0</span>
+    {% endif %}
+  </td>
   <td class="text-sm opacity-40" x-show="columns.documents">–</td>
   <td class="w-px px-1 pr-3" @click.stop>
     <button class="btn btn-ghost btn-xs btn-square opacity-0 group-hover:opacity-100 transition-opacity">

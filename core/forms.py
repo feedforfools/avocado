@@ -1,5 +1,5 @@
 from django import forms
-from .models import Activity, Contact, Fascicolo, ProceedingType
+from .models import Activity, Contact, Deadline, Fascicolo, ProceedingType
 
 
 class ContactForm(forms.ModelForm):
@@ -148,6 +148,33 @@ class FascicoloCreateForm(forms.Form):
             contacts_qs = Contact.objects.filter(owner=user).order_by('last_name', 'first_name')
             self.fields['client_contact'].queryset = contacts_qs
             self.fields['opposing_party_contact'].queryset = contacts_qs
+
+
+class DeadlineForm(forms.ModelForm):
+    class Meta:
+        model = Deadline
+        fields = ['label', 'due_date', 'notes']
+        widgets = {
+            'label': forms.TextInput(attrs={
+                'class': _INPUT,
+                'placeholder': 'es. Deposito memoria difensiva',
+                'autofocus': True,
+            }),
+            'due_date': forms.DateInput(attrs={
+                'class': _INPUT,
+                'type': 'date',
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': _TEXTAREA,
+                'rows': '2',
+                'placeholder': 'Note opzionali...',
+            }),
+        }
+        labels = {
+            'label': 'Descrizione',
+            'due_date': 'Data scadenza',
+            'notes': 'Note',
+        }
 
 
 class ActivityForm(forms.ModelForm):

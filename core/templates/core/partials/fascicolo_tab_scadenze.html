@@ -1,14 +1,157 @@
-{# Scadenze tab — deadline list (calculated + manual). Stub: no Deadline model yet. Will be implemented in the next sprint. #}
+{# Scadenze tab — manual + template-computed deadlines. #}
 
-<div class="p-4 flex flex-col items-center justify-center py-16 text-center">
-  <iconify-icon icon="lucide:calendar-x-2" width="40" height="40" class="text-base-content/20 mb-4"></iconify-icon>
-  <h3 class="text-base font-semibold text-base-content/60 mb-1">Nessuna scadenza</h3>
-  <p class="text-sm text-base-content/40 max-w-xs">
-    Le scadenze procedurali — calcolate dal tipo di procedimento e quelle aggiunte manualmente — appariranno qui.
-  </p>
-  <button class="btn btn-primary btn-sm mt-5" disabled>
-    <iconify-icon icon="lucide:plus" width="15" height="15"></iconify-icon>
-    Aggiungi scadenza
-  </button>
-  <p class="text-xs text-base-content/30 mt-2">Disponibile a breve</p>
+{# Wrapper re-fetches this tab whenever a deadline is created or toggled. #}
+<div hx-get="{% url 'core:fascicolo_tab' pk=fascicolo.pk tab='scadenze' %}"
+     hx-trigger="deadlineChanged from:body"
+     hx-target="#fascicolo-tab-content"
+     hx-swap="innerHTML">
+
+  {# ── Toolbar ── #}
+  <div class="flex items-center justify-between px-4 pt-4 pb-3">
+    <span class="text-sm font-semibold text-base-content/70">
+      {% with total=deadlines_template|length|add:deadlines_manual|length %}
+        {{ total }} scadenz{% if total == 1 %}a{% else %}e{% endif %}
+      {% endwith %}
+    </span>
+    <button class="btn btn-primary btn-sm gap-1"
+            hx-get="{% url 'core:deadline_form_modal' fascicolo.pk %}"
+            hx-target="#deadline-modal-container"
+            hx-swap="innerHTML">
+      <iconify-icon icon="lucide:plus" width="14" height="14"></iconify-icon>
+      Aggiungi scadenza
+    </button>
+  </div>
+
+  {# Modal mount point #}
+  <div id="deadline-modal-container"></div>
+
+  {% if not deadlines_template and not deadlines_manual %}
+  {# ── Global empty state ── #}
+  <div class="flex flex-col items-center justify-center py-14 text-center">
+    <iconify-icon icon="lucide:calendar-clock" width="32" height="32" class="text-base-content/20 mb-3"></iconify-icon>
+    <p class="text-sm font-medium text-base-content/40 mb-1">Nessuna scadenza</p>
+    <p class="text-xs text-base-content/30 max-w-xs">
+      Aggiungi scadenze manuali con il pulsante in alto. Le scadenze calcolate dal tipo di procedimento appariranno qui quando imposti una data di udienza.
+    </p>
+  </div>
+  {% else %}
+
+  {% if deadlines_template %}
+  {# ── Calcolate section ── #}
+  <div class="px-4 pb-1">
+    <h4 class="text-xs font-semibold text-base-content/40 uppercase tracking-wide">Calcolate</h4>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
+        <tr class="bg-base-200 text-base-content text-xs [&>th]:py-2">
+          <th>Scadenza</th>
+          <th>Data</th>
+          <th>Note</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for deadline in deadlines_template %}
+        <tr class="hover:bg-base-200{% if deadline.is_completed %} opacity-50{% endif %}">
+          <td class="font-medium">
+            {% if deadline.is_completed %}<s class="text-base-content/50">{{ deadline.label }}</s>{% else %}{{ deadline.label }}{% endif %}
+          </td>
+          <td class="whitespace-nowrap">
+            {% if deadline.urgency == 'overdue' %}
+              <span class="badge badge-error badge-sm">{{ deadline.due_date|date:"d/m/Y" }}</span>
+            {% elif deadline.urgency == 'soon' %}
+              <span class="badge badge-warning badge-sm">{{ deadline.due_date|date:"d/m/Y" }}</span>
+            {% elif deadline.urgency == 'completed' %}
+              <span class="badge badge-ghost badge-sm">{{ deadline.due_date|date:"d/m/Y" }}</span>
+            {% else %}
+              <span class="badge badge-success badge-sm">{{ deadline.due_date|date:"d/m/Y" }}</span>
+            {% endif %}
+          </td>
+          <td class="text-base-content/50 text-sm max-w-xs truncate">{{ deadline.notes }}</td>
+          <td class="text-right">
+            <form hx-post="{% url 'core:deadline_toggle_complete' fascicolo.pk deadline.pk %}"
+                  hx-swap="none">
+              {% csrf_token %}
+              <button type="submit"
+                      class="btn btn-ghost btn-xs"
+                      title="{% if deadline.is_completed %}Riapri scadenza{% else %}Segna come completata{% endif %}">
+                {% if deadline.is_completed %}
+                  <iconify-icon icon="lucide:circle-check" width="15" height="15" class="text-success"></iconify-icon>
+                {% else %}
+                  <iconify-icon icon="lucide:circle" width="15" height="15" class="text-base-content/30"></iconify-icon>
+                {% endif %}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if deadlines_manual %}
+  {# ── Manuali section ── #}
+  <div class="px-4 {% if deadlines_template %}pt-5{% endif %} pb-1">
+    <h4 class="text-xs font-semibold text-base-content/40 uppercase tracking-wide">Manuali</h4>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
+        <tr class="bg-base-200 text-base-content text-xs [&>th]:py-2">
+          <th>Scadenza</th>
+          <th>Data</th>
+          <th>Note</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for deadline in deadlines_manual %}
+        <tr class="hover:bg-base-200{% if deadline.is_completed %} opacity-50{% endif %}">
+          <td class="font-medium">
+            {% if deadline.is_completed %}<s class="text-base-content/50">{{ deadline.label }}</s>{% else %}{{ deadline.label }}{% endif %}
+          </td>
+          <td class="whitespace-nowrap">
+            {% if deadline.urgency == 'overdue' %}
+              <span class="badge badge-error badge-sm">{{ deadline.due_date|date:"d/m/Y" }}</span>
+            {% elif deadline.urgency == 'soon' %}
+              <span class="badge badge-warning badge-sm">{{ deadline.due_date|date:"d/m/Y" }}</span>
+            {% elif deadline.urgency == 'completed' %}
+              <span class="badge badge-ghost badge-sm">{{ deadline.due_date|date:"d/m/Y" }}</span>
+            {% else %}
+              <span class="badge badge-success badge-sm">{{ deadline.due_date|date:"d/m/Y" }}</span>
+            {% endif %}
+          </td>
+          <td class="text-base-content/50 text-sm max-w-xs truncate">{{ deadline.notes }}</td>
+          <td class="text-right">
+            <form hx-post="{% url 'core:deadline_toggle_complete' fascicolo.pk deadline.pk %}"
+                  hx-swap="none">
+              {% csrf_token %}
+              <button type="submit"
+                      class="btn btn-ghost btn-xs"
+                      title="{% if deadline.is_completed %}Riapri scadenza{% else %}Segna come completata{% endif %}">
+                {% if deadline.is_completed %}
+                  <iconify-icon icon="lucide:circle-check" width="15" height="15" class="text-success"></iconify-icon>
+                {% else %}
+                  <iconify-icon icon="lucide:circle" width="15" height="15" class="text-base-content/30"></iconify-icon>
+                {% endif %}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% elif deadlines_template %}
+  {# template deadlines exist but no manual ones — show small hint #}
+  <div class="px-4 pt-5 pb-1">
+    <h4 class="text-xs font-semibold text-base-content/40 uppercase tracking-wide">Manuali</h4>
+    <p class="text-xs text-base-content/30 mt-2">Nessuna scadenza manuale aggiunta.</p>
+  </div>
+  {% endif %}
+
+  {% endif %}{# end if not empty #}
+
 </div>
