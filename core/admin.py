@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Contact, DeadlineRule, Fascicolo, FascicoloParty, ProceedingType
+from .models import Activity, Contact, DeadlineRule, Fascicolo, FascicoloParty, ProceedingType
 
 
 @admin.register(Contact)
@@ -48,5 +48,18 @@ class FascicoloAdmin(admin.ModelAdmin):
 @admin.register(FascicoloParty)
 class FascicoloPartyAdmin(admin.ModelAdmin):
     list_display = ['fascicolo', 'contact', 'role']
-    list_filter = ['role']
-    search_fields = ['fascicolo__auto_title', 'contact__last_name']
+
+
+class ActivityInline(admin.TabularInline):
+    model = Activity
+    extra = 0
+    fields = ['date', 'activity_type', 'dm55_phase', 'duration_hours', 'notes']
+    ordering = ['-date']
+
+
+@admin.register(Activity)
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ['fascicolo', 'date', 'activity_type', 'dm55_phase', 'duration_hours']
+    list_filter = ['activity_type', 'dm55_phase']
+    search_fields = ['fascicolo__auto_title', 'fascicolo__custom_title', 'notes']
+    date_hierarchy = 'date'

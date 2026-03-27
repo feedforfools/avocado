@@ -1,15 +1,61 @@
-{# Attività tab — reverse-chronological activity log.
-   Stub: no Activity model yet. Will be implemented in the next sprint. #}
+{# Attività tab — reverse-chronological activity log. #}
 
-<div class="p-4 flex flex-col items-center justify-center py-16 text-center">
-  <iconify-icon icon="lucide:clipboard-list" width="40" height="40" class="text-base-content/20 mb-4"></iconify-icon>
-  <h3 class="text-base font-semibold text-base-content/60 mb-1">Nessuna attività</h3>
-  <p class="text-sm text-base-content/40 max-w-xs">
-    Le attività del fascicolo — udienze, telefonate, studio degli atti — verranno registrate qui.
-  </p>
-  <button class="btn btn-primary btn-sm mt-5" disabled>
-    <iconify-icon icon="lucide:plus" width="15" height="15"></iconify-icon>
-    Aggiungi attività
-  </button>
-  <p class="text-xs text-base-content/30 mt-2">Disponibile a breve</p>
+{# Wrapper listens for activityCreated (fired on successful modal submit) and re-fetches this tab to refresh the list. #}
+<div hx-get="{% url 'core:fascicolo_tab' pk=fascicolo.pk tab='attivita' %}"
+     hx-trigger="activityCreated from:body"
+     hx-target="#fascicolo-tab-content"
+     hx-swap="innerHTML">
+
+  {# ── Toolbar ── #}
+  <div class="flex items-center justify-between px-4 pt-4 pb-3">
+    <span class="text-sm font-semibold text-base-content/70">
+      {{ activities|length }} attività
+    </span>
+    <button class="btn btn-primary btn-sm gap-1"
+            hx-get="{% url 'core:activity_form_modal' fascicolo.pk %}"
+            hx-target="#activity-modal-container"
+            hx-swap="innerHTML">
+      <iconify-icon icon="lucide:plus" width="14" height="14"></iconify-icon>
+      Aggiungi attività
+    </button>
+  </div>
+
+  {# Modal mount point #}
+  <div id="activity-modal-container"></div>
+
+  {# ── Table ── #}
+  {% if activities %}
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
+        <tr class="bg-base-200 text-base-content text-xs [&>th]:py-2">
+          <th>Data</th>
+          <th>Tipo</th>
+          <th>Fase DM55</th>
+          <th>Durata</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for activity in activities %}
+        <tr class="hover:bg-base-200">
+          <td class="whitespace-nowrap font-medium">{{ activity.date|date:"d/m/Y" }}</td>
+          <td>{{ activity.get_activity_type_display }}</td>
+          <td>
+            <span class="badge badge-sm bg-primary-content text-primary border-none">{{ activity.get_dm55_phase_display }}</span>
+          </td>
+          <td class="whitespace-nowrap">{{ activity.duration_hours }}h</td>
+          <td class="text-base-content/60 max-w-xs truncate">{{ activity.notes }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="flex flex-col items-center justify-center py-14 text-center">
+    <iconify-icon icon="lucide:clipboard-list" width="32" height="32" class="text-base-content/20 mb-3"></iconify-icon>
+    <p class="text-sm text-base-content/40">Nessuna attività registrata.</p>
+  </div>
+  {% endif %}
+
 </div>

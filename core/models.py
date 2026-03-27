@@ -292,3 +292,51 @@ class FascicoloParty(models.Model):
         result = super().delete(using=using, keep_parents=keep_parents)
         fascicolo.refresh_auto_title()
         return result
+
+
+class Activity(models.Model):
+    """A single time-stamped activity entry on a Fascicolo.
+
+    Used as the source of truth for the Parcella (invoice) draft.
+    dm55_phase is a strict choice field — never free text — because it is
+    the key that drives the DM55/2014 tariff engine.
+    """
+
+    ACTIVITY_TYPE_CHOICES = [
+        ('udienza', 'Udienza'),
+        ('studio', 'Studio'),
+        ('redazione', 'Redazione atti'),
+        ('corrispondenza', 'Corrispondenza'),
+        ('consulenza', 'Consulenza'),
+        ('telefonate', 'Telefonate'),
+        ('riunione', 'Riunione'),
+        ('altro', 'Altro'),
+    ]
+
+    DM55_PHASE_CHOICES = [
+        ('studio', 'Fase di studio'),
+        ('introduttiva', 'Fase introduttiva'),
+        ('istruttoria', 'Fase istruttoria'),
+        ('decisionale', 'Fase decisionale'),
+    ]
+
+    fascicolo = models.ForeignKey(
+        Fascicolo,
+        on_delete=models.CASCADE,
+        related_name='activities',
+    )
+    date = models.DateField('Data')
+    activity_type = models.CharField('Tipo', max_length=20, choices=ACTIVITY_TYPE_CHOICES)
+    dm55_phase = models.CharField('Fase DM55', max_length=15, choices=DM55_PHASE_CHOICES)
+    duration_hours = models.DecimalField('Durata (ore)', max_digits=5, decimal_places=2)
+    notes = models.TextField('Note', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-date', '-created_at']
+        verbose_name = 'Attività'
+        verbose_name_plural = 'Attività'
+
+    def __str__(self) -> str:
+        return f"{self.get_activity_type_display()} – {self.date}"  # type: ignore[attr-defined]

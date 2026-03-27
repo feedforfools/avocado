@@ -1,5 +1,5 @@
 from django import forms
-from .models import Contact, Fascicolo, ProceedingType
+from .models import Activity, Contact, Fascicolo, ProceedingType
 
 
 class ContactForm(forms.ModelForm):
@@ -148,3 +148,35 @@ class FascicoloCreateForm(forms.Form):
             contacts_qs = Contact.objects.filter(owner=user).order_by('last_name', 'first_name')
             self.fields['client_contact'].queryset = contacts_qs
             self.fields['opposing_party_contact'].queryset = contacts_qs
+
+
+class ActivityForm(forms.ModelForm):
+    class Meta:
+        model = Activity
+        fields = ['date', 'activity_type', 'dm55_phase', 'duration_hours', 'notes']
+        widgets = {
+            'date': forms.DateInput(attrs={
+                'class': _INPUT,
+                'type': 'date',
+            }),
+            'activity_type': forms.Select(attrs={'class': _SELECT}),
+            'dm55_phase': forms.Select(attrs={'class': _SELECT}),
+            'duration_hours': forms.NumberInput(attrs={
+                'class': _INPUT,
+                'placeholder': 'es. 1.5',
+                'min': '0.25',
+                'step': '0.25',
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': _TEXTAREA,
+                'rows': '2',
+                'placeholder': 'Breve descrizione dell\'attività (facoltativo)',
+            }),
+        }
+        labels = {
+            'date': 'Data',
+            'activity_type': 'Tipo',
+            'dm55_phase': 'Fase DM55',
+            'duration_hours': 'Durata (ore)',
+            'notes': 'Note',
+        }

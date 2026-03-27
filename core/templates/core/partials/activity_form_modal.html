@@ -1,0 +1,96 @@
+<dialog id="activity-form-modal" class="modal">
+  <div class="modal-box max-w-lg">
+
+    {# ── Header ──────────────────────────────────────────────────────── #}
+    <div class="flex items-center gap-2 mb-5">
+      <iconify-icon icon="lucide:clipboard-list" width="18" height="18" class="text-primary"></iconify-icon>
+      <h3 class="text-base font-semibold">Nuova attività</h3>
+    </div>
+
+    <form
+      id="activity-form"
+      hx-post="{% url 'core:activity_create' fascicolo.pk %}"
+      hx-target="#activity-modal-container"
+      hx-swap="innerHTML"
+      class="space-y-4"
+    >
+      {% csrf_token %}
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="form-control">
+          <label class="label pb-1">
+            <span class="label-text font-medium">
+              {{ form.date.label }}<span class="text-error ml-0.5">*</span>
+            </span>
+          </label>
+          {{ form.date }}
+          {% if form.date.errors %}
+            <p class="text-error text-xs mt-1">{{ form.date.errors.0 }}</p>
+          {% endif %}
+        </div>
+        <div class="form-control">
+          <label class="label pb-1">
+            <span class="label-text font-medium">
+              {{ form.duration_hours.label }}<span class="text-error ml-0.5">*</span>
+            </span>
+          </label>
+          {{ form.duration_hours }}
+          {% if form.duration_hours.errors %}
+            <p class="text-error text-xs mt-1">{{ form.duration_hours.errors.0 }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="form-control">
+          <label class="label pb-1">
+            <span class="label-text font-medium">
+              {{ form.activity_type.label }}<span class="text-error ml-0.5">*</span>
+            </span>
+          </label>
+          {{ form.activity_type }}
+          {% if form.activity_type.errors %}
+            <p class="text-error text-xs mt-1">{{ form.activity_type.errors.0 }}</p>
+          {% endif %}
+        </div>
+        <div class="form-control">
+          <label class="label pb-1">
+            <span class="label-text font-medium">
+              {{ form.dm55_phase.label }}<span class="text-error ml-0.5">*</span>
+            </span>
+          </label>
+          {{ form.dm55_phase }}
+          {% if form.dm55_phase.errors %}
+            <p class="text-error text-xs mt-1">{{ form.dm55_phase.errors.0 }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-control">
+        <label class="label pb-1">
+          <span class="label-text font-medium">{{ form.notes.label }}</span>
+          <span class="label-text-alt text-base-content/50">opzionale</span>
+        </label>
+        {{ form.notes }}
+        {% if form.notes.errors %}
+          <p class="text-error text-xs mt-1">{{ form.notes.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      {# ── Actions ─────────────────────────────────────────────────── #}
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button type="button" class="btn btn-ghost"
+                onclick="document.getElementById('activity-form-modal').close()">Annulla</button>
+        <button type="submit" class="btn btn-primary gap-1">
+          <iconify-icon icon="lucide:plus" width="16" height="16"></iconify-icon>
+          Aggiungi
+        </button>
+      </div>
+
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+<script>document.getElementById('activity-form-modal').showModal()</script>

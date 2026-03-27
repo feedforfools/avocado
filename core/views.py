@@ -6,8 +6,8 @@ from django.db import transaction
 from django.db.models import OuterRef, Q, Subquery
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import Contact, Fascicolo, FascicoloParty
-from .forms import ContactForm, FascicoloCreateForm
+from .models import Activity, Contact, Fascicolo, FascicoloParty
+from .forms import ActivityForm, ContactForm, FascicoloCreateForm
 
 @login_required
 def index(request):
@@ -237,6 +237,7 @@ def fascicolo_detail(request, pk):
         'fascicolo': fascicolo,
         'parties': _sorted_parties(fascicolo),
         'active_tab': 'panoramica',
+        'activity_count': Activity.objects.filter(fascicolo=fascicolo).count(),
     })
 
 
@@ -245,9 +246,39 @@ def fascicolo_tab(request, pk, tab):
     if tab not in _VALID_TABS:
         raise Http404
     fascicolo = _fascicolo_with_parties(pk, request.user)
-    return render(request, f'core/partials/fascicolo_tab_{tab}.html', {
+    ctx = {
         'fascicolo': fascicolo,
         'active_tab': tab,
+    }
+    if tab == 'attivita':
+        ctx['activities'] = Activity.objects.filter(fascicolo=fascicolo)
+    elif tab == 'panoramica':
+        ctx['activity_count'] = Activity.objects.filter(fascicolo=fascicolo).count()
+    return render(request, f'core/partials/fascicolo_tab_{tab}.html', ctx)
+
+
+@login_required
+def activity_form_modal(request, pk):
+    fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
+    return render(request, 'core/partials/activity_form_modal.html', {
+        'fascicolo': fascicolo,
+        'form': ActivityForm(),
+    })
+
+
+@login_required
+@require_POST
+def activity_create(request, pk):
+    fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
+    form = ActivityForm(request.POST)
+    if form.is_valid():
+        activity = form.save(commit=False)
+        activity.fascicolo = fascicolo
+        activity.save()
+        return HttpResponse(headers={'HX-Trigger': 'activityCreated'})
+    return render(request, 'core/partials/activity_form_modal.html', {
+        'fascicolo': fascicolo,
+        'form': form,
     })
 
 
