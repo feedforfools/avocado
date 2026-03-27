@@ -1,9 +1,9 @@
 from django.contrib.auth.decorators import login_required
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import OuterRef, Q, Subquery
-from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Contact, Fascicolo, FascicoloParty
@@ -211,14 +211,44 @@ def fascicoli(request):
     return render(request, 'core/fascicoli.html', ctx)
 
 
+_VALID_TABS = frozenset({'panoramica', 'attivita', 'scadenze', 'documenti', 'parcella'})
+_PARTY_ROLE_ORDER = ['client', 'opposing_party', 'opposing_counsel', 'expert_witness', 'judge', 'other']
+
+
+def _fascicolo_with_parties(pk, user):
+    return get_object_or_404(
+        Fascicolo.objects.select_related('proceeding_type').prefetch_related('parties__contact'),
+        pk=pk,
+        owner=user,
+    )
+
+
+def _sorted_parties(fascicolo):
+    return sorted(
+        fascicolo.parties.all(),
+        key=lambda p: _PARTY_ROLE_ORDER.index(p.role) if p.role in _PARTY_ROLE_ORDER else len(_PARTY_ROLE_ORDER),
+    )
+
+
 @login_required
 def fascicolo_detail(request, pk):
-    # Stub — full detail page is the next sprint.
-    fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
-    return HttpResponse(
-        f'<p style="font-family:sans-serif;padding:2rem">← <a href="/fascicoli/">Fascicoli</a> &nbsp;|&nbsp; '
-        f'<strong>{fascicolo.display_title}</strong> — dettaglio in arrivo.</p>'
-    )
+    fascicolo = _fascicolo_with_parties(pk, request.user)
+    return render(request, 'core/fascicolo_detail.html', {
+        'fascicolo': fascicolo,
+        'parties': _sorted_parties(fascicolo),
+        'active_tab': 'panoramica',
+    })
+
+
+@login_required
+def fascicolo_tab(request, pk, tab):
+    if tab not in _VALID_TABS:
+        raise Http404
+    fascicolo = _fascicolo_with_parties(pk, request.user)
+    return render(request, f'core/partials/fascicolo_tab_{tab}.html', {
+        'fascicolo': fascicolo,
+        'active_tab': tab,
+    })
 
 
 @login_required

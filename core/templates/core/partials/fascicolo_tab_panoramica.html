@@ -1,0 +1,67 @@
+{# Panoramica tab — summary stats for the fascicolo.
+   Stub: shows placeholders for data not yet modelled (activities, deadlines, docs, billing). #}
+
+<div class="p-4 max-w-3xl">
+
+  {# ── Stat cards ──────────────────────────────────────────────────────── #}
+  <div class="grid grid-cols-2 gap-3 mb-6">
+
+    {# Attività #}
+    <div class="card bg-base-100 border border-base-200">
+      <div class="card-body p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">Attività</span>
+          <iconify-icon icon="lucide:activity" width="15" height="15" class="text-base-content/25"></iconify-icon>
+        </div>
+        <p class="text-2xl font-bold leading-none">0</p>
+        <p class="text-xs text-base-content/40 mt-1">Nessuna attività registrata</p>
+      </div>
+    </div>
+
+    {# Prossima scadenza #}
+    <div class="card bg-base-100 border border-base-200">
+      <div class="card-body p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">Prossima scadenza</span>
+          <iconify-icon icon="lucide:calendar-clock" width="15" height="15" class="text-base-content/25"></iconify-icon>
+        </div>
+        <p class="text-sm font-medium text-base-content/40 leading-none">—</p>
+        <p class="text-xs text-base-content/40 mt-1">Nessuna scadenza impostata</p>
+      </div>
+    </div>
+
+    {# Documenti #}
+    <div class="card bg-base-100 border border-base-200">
+      <div class="card-body p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">Documenti</span>
+          <iconify-icon icon="lucide:paperclip" width="15" height="15" class="text-base-content/25"></iconify-icon>
+        </div>
+        <p class="text-2xl font-bold leading-none">0</p>
+        <p class="text-xs text-base-content/40 mt-1">Nessun documento allegato</p>
+      </div>
+    </div>
+
+    {# Parcella #}
+    <div class="card bg-base-100 border border-base-200">
+      <div class="card-body p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-base-content/50 uppercase tracking-wider">Parcella</span>
+          <iconify-icon icon="lucide:receipt" width="15" height="15" class="text-base-content/25"></iconify-icon>
+        </div>
+        <p class="text-sm font-medium text-base-content/40 leading-none">—</p>
+        <p class="text-xs text-base-content/40 mt-1">Bozza non generata</p>
+      </div>
+    </div>
+
+  </div>
+
+  {# ── Getting-started prompt ─────────────────────────────────────────── #}
+  <div class="alert border border-base-200 bg-base-100 text-sm">
+    <iconify-icon icon="lucide:info" width="16" height="16" class="text-base-content/40 shrink-0"></iconify-icon>
+    <span class="text-base-content/60">
+      Aggiungi attività e scadenze per vedere il riepilogo del fascicolo qui.
+    </span>
+  </div>
+
+</div>

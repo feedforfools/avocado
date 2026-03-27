@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}{{ fascicolo.display_title }} | {% endblock %}
+
+{% block foil_header %}
+<div class="flex w-full items-center justify-between gap-3 min-w-0">
+
+  {# ── Breadcrumb + title ── #}
+  <div class="flex items-center gap-3 min-w-0">
+    <a href="{% url 'core:fascicoli' %}"
+       class="flex items-center gap-1 text-sm text-base-content/60 hover:text-base-content transition-colors flex-shrink-0">
+      <iconify-icon icon="lucide:chevron-left" width="16" height="16"></iconify-icon>
+      Fascicoli
+    </a>
+    <div class="h-4 w-px bg-base-300 flex-shrink-0"></div>
+    <span class="text-sm font-semibold truncate">{{ fascicolo.display_title }}</span>
+  </div>
+
+  {# ── Badges + actions ── #}
+  <div class="flex items-center gap-2 flex-shrink-0">
+    {% if fascicolo.proceeding_type %}
+      <span class="badge badge-outline badge-sm">{{ fascicolo.proceeding_type.name }}</span>
+    {% endif %}
+    {% if fascicolo.status == 'active' %}
+      <span class="badge badge-success badge-sm">Attivo</span>
+    {% elif fascicolo.status == 'suspended' %}
+      <span class="badge badge-warning badge-sm">Sospeso</span>
+    {% else %}
+      <span class="badge badge-ghost badge-sm">Archiviato</span>
+    {% endif %}
+
+    <div class="dropdown dropdown-end">
+      <button tabindex="0" class="btn btn-ghost btn-xs btn-square" aria-label="Azioni">
+        <iconify-icon icon="lucide:more-horizontal" width="16" height="16"></iconify-icon>
+      </button>
+      <ul tabindex="0"
+          class="dropdown-content menu bg-base-100 rounded-box shadow-lg border border-base-200 z-50 w-48 p-1 text-sm">
+        <li><a href="#">Modifica dati</a></li>
+        <li><a href="#">Sospendi</a></li>
+        <li><a href="#">Archivia</a></li>
+        <li><hr class="border-base-200 my-0.5"></li>
+        <li><a href="#" class="text-error">Elimina fascicolo</a></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+
+{% block content %}
+{# Two-column layout: stable left panel + HTMX-swapped right panel #}
+<div class="flex -m-2">
+
+  {# ── Left Panel — parties + metadata (never swapped by HTMX) ──────── #}
+  <aside class="w-64 shrink-0 border-r border-base-200 self-stretch">
+    {% include "core/partials/fascicolo_left_panel.html" %}
+  </aside>
+
+  {# ── Right Panel — tab strip + swappable tab content ─────────────── #}
+  <div class="flex-1 flex flex-col min-w-0" x-data="{ activeTab: 'panoramica' }">
+
+    {# Tab strip #}
+    <div class="border-b border-base-200 px-4 flex-shrink-0">
+      <div role="tablist" class="tabs tabs-border">
+
+        <button role="tab"
+                class="tab tab-active"
+                :class="{ 'tab-active': activeTab === 'panoramica' }"
+                @click="activeTab = 'panoramica'"
+                hx-get="{% url 'core:fascicolo_tab' pk=fascicolo.pk tab='panoramica' %}"
+                hx-target="#fascicolo-tab-content"
+                hx-swap="innerHTML">
+          Panoramica
+        </button>
+
+        <button role="tab"
+                class="tab"
+                :class="{ 'tab-active': activeTab === 'attivita' }"
+                @click="activeTab = 'attivita'"
+                hx-get="{% url 'core:fascicolo_tab' pk=fascicolo.pk tab='attivita' %}"
+                hx-target="#fascicolo-tab-content"
+                hx-swap="innerHTML">
+          Attività
+        </button>
+
+        <button role="tab"
+                class="tab"
+                :class="{ 'tab-active': activeTab === 'scadenze' }"
+                @click="activeTab = 'scadenze'"
+                hx-get="{% url 'core:fascicolo_tab' pk=fascicolo.pk tab='scadenze' %}"
+                hx-target="#fascicolo-tab-content"
+                hx-swap="innerHTML">
+          Scadenze
+        </button>
+
+        <button role="tab"
+                class="tab"
+                :class="{ 'tab-active': activeTab === 'documenti' }"
+                @click="activeTab = 'documenti'"
+                hx-get="{% url 'core:fascicolo_tab' pk=fascicolo.pk tab='documenti' %}"
+                hx-target="#fascicolo-tab-content"
+                hx-swap="innerHTML">
+          Documenti
+        </button>
+
+        <button role="tab"
+                class="tab"
+                :class="{ 'tab-active': activeTab === 'parcella' }"
+                @click="activeTab = 'parcella'"
+                hx-get="{% url 'core:fascicolo_tab' pk=fascicolo.pk tab='parcella' %}"
+                hx-target="#fascicolo-tab-content"
+                hx-swap="innerHTML">
+          Parcella
+        </button>
+
+      </div>
+    </div>
+
+    {# Tab content — replaced by HTMX on tab click #}
+    <div id="fascicolo-tab-content" class="flex-1">
+      {% include "core/partials/fascicolo_tab_panoramica.html" %}
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
