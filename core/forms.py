@@ -2,34 +2,22 @@ from django import forms
 from .models import Activity, Contact, Deadline, Fascicolo, ProceedingType
 
 
+_INPUT = 'input input-bordered w-full'
+_SELECT = 'select select-bordered w-full'
+_TEXTAREA = 'textarea textarea-bordered w-full'
+
+
 class ContactForm(forms.ModelForm):
     class Meta:
         model = Contact
         fields = ['first_name', 'last_name', 'email', 'phone_number', 'address', 'role']
         widgets = {
-            'first_name': forms.TextInput(attrs={
-                'class': 'input input-bordered w-full',
-                'placeholder': 'Nome',
-            }),
-            'last_name': forms.TextInput(attrs={
-                'class': 'input input-bordered w-full',
-                'placeholder': 'Cognome',
-            }),
-            'email': forms.EmailInput(attrs={
-                'class': 'input input-bordered w-full',
-                'placeholder': 'Email',
-            }),
-            'phone_number': forms.TextInput(attrs={
-                'class': 'input input-bordered w-full',
-                'placeholder': 'Telefono',
-            }),
-            'address': forms.TextInput(attrs={
-                'class': 'input input-bordered w-full',
-                'placeholder': 'Indirizzo',
-            }),
-            'role': forms.Select(attrs={
-                'class': 'select select-bordered w-full',
-            }),
+            'first_name': forms.TextInput(attrs={'class': _INPUT, 'placeholder': 'Nome'}),
+            'last_name': forms.TextInput(attrs={'class': _INPUT, 'placeholder': 'Cognome'}),
+            'email': forms.EmailInput(attrs={'class': _INPUT, 'placeholder': 'Email'}),
+            'phone_number': forms.TextInput(attrs={'class': _INPUT, 'placeholder': 'Telefono'}),
+            'address': forms.TextInput(attrs={'class': _INPUT, 'placeholder': 'Indirizzo'}),
+            'role': forms.Select(attrs={'class': _SELECT}),
         }
         labels = {
             'first_name': 'Nome',
@@ -39,11 +27,6 @@ class ContactForm(forms.ModelForm):
             'address': 'Indirizzo',
             'role': 'Ruolo',
         }
-
-
-_INPUT = 'input input-bordered w-full'
-_SELECT = 'select select-bordered w-full'
-_TEXTAREA = 'textarea textarea-bordered w-full'
 
 
 class FascicoloCreateForm(forms.Form):
