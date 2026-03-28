@@ -7,10 +7,7 @@
      hx-swap="innerHTML">
 
   {# ── Toolbar ── #}
-  <div class="flex items-center justify-between px-4 pt-4 pb-3">
-    <span class="text-sm font-semibold text-base-content/70">
-      {{ activities|length }} attività
-    </span>
+  <div class="flex items-center justify-end px-4 pt-4 pb-3">
     <button class="btn btn-primary btn-sm gap-1"
             hx-get="{% url 'core:activity_form_modal' fascicolo.pk %}"
             hx-target="#activity-modal-container"
@@ -49,6 +46,15 @@
         </tr>
         {% endfor %}
       </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5" class="font-medium text-xs py-1 border-b border-base-200">
+            <div class="flex items-center">
+              <span class="ml-auto">{{ activities|length }} attività</span>
+            </div>
+          </th>
+        </tr>
+      </tfoot>
     </table>
   </div>
   {% else %}
