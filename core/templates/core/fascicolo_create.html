@@ -112,8 +112,8 @@
         </p>
 
         <div class="grid grid-cols-2 gap-4">
-          {% include "core/partials/contact_picker.html" with picker_field=form.client_contact picker_optional=False only %}
-          {% include "core/partials/contact_picker.html" with picker_field=form.opposing_party_contact picker_optional=True only %}
+          {% include "core/partials/contacts/picker.html" with picker_field=form.client_contact picker_optional=False only %}
+          {% include "core/partials/contacts/picker.html" with picker_field=form.opposing_party_contact picker_optional=True only %}
         </div>
       </div>
     </div>

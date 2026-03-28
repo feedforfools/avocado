@@ -14,7 +14,7 @@ from .forms import ActivityForm, ContactForm, DeadlineForm, FascicoloCreateForm
 @login_required
 def index(request):
     if request.htmx:
-        return render(request, 'core/partials/greeting.html')
+        return render(request, 'core/partials/shared/greeting.html')
     return render(request, 'core/index.html')
 
 @login_required
@@ -38,7 +38,7 @@ def contacts(request):
         'sort_dir': sort_dir,
     }
     if request.htmx:
-        template = 'core/partials/contacts_table.html' if request.htmx.target == 'contacts-table' else 'core/partials/contacts_body.html'
+        template = 'core/partials/contacts/table.html' if request.htmx.target == 'contacts-table' else 'core/partials/contacts/body.html'
         return render(request, template, ctx)
     return render(request, 'core/contacts.html', ctx)
 
@@ -49,7 +49,7 @@ def contact_toggle_favorite(request, pk):
     contact = get_object_or_404(Contact, pk=pk, owner=request.user)
     contact.favorite = not contact.favorite
     contact.save(update_fields=['favorite'])
-    return render(request, 'core/partials/contact_row.html', {'contact': contact})
+    return render(request, 'core/partials/contacts/row.html', {'contact': contact})
 
 
 @login_required
@@ -57,7 +57,7 @@ def contact_toggle_favorite(request, pk):
 def contact_delete(request, pk):
     contact = get_object_or_404(Contact, pk=pk, owner=request.user)
     contact.delete()
-    return render(request, 'core/partials/contacts_body.html', _contacts_ctx(request))
+    return render(request, 'core/partials/contacts/body.html', _contacts_ctx(request))
 
 
 SORT_FIELDS = {
@@ -109,7 +109,7 @@ def _contacts_ctx(request):
 def contact_form_modal(request, pk=None):
     contact = get_object_or_404(Contact, pk=pk, owner=request.user) if pk else None
     form = ContactForm(instance=contact)
-    return render(request, 'core/partials/contact_form_modal.html', {'form': form})
+    return render(request, 'core/partials/contacts/form_modal.html', {'form': form})
 
 
 @login_required
@@ -121,7 +121,7 @@ def contact_create(request):
         contact.owner = request.user
         contact.save()
         return HttpResponse(headers={'HX-Trigger': 'contacts-changed'})
-    return render(request, 'core/partials/contact_form_modal.html', {'form': form})
+    return render(request, 'core/partials/contacts/form_modal.html', {'form': form})
 
 
 @login_required
@@ -132,7 +132,7 @@ def contact_edit(request, pk):
     if form.is_valid():
         form.save()
         return HttpResponse(headers={'HX-Trigger': 'contacts-changed'})
-    return render(request, 'core/partials/contact_form_modal.html', {'form': form})
+    return render(request, 'core/partials/contacts/form_modal.html', {'form': form})
 
 
 # ---------------------------------------------------------------------------
@@ -235,9 +235,9 @@ def fascicoli(request):
     ctx = _fascicoli_ctx(request)
     if request.htmx:
         template = (
-            'core/partials/fascicoli_table.html'
+            'core/partials/fascicoli/table.html'
             if request.htmx.target == 'fascicoli-table'
-            else 'core/partials/fascicoli_body.html'
+            else 'core/partials/fascicoli/body.html'
         )
         return render(request, template, ctx)
     return render(request, 'core/fascicoli.html', ctx)
@@ -307,13 +307,13 @@ def fascicolo_tab(request, pk, tab):
         deadlines_qs = Deadline.objects.filter(fascicolo=fascicolo).order_by('is_completed', 'due_date')
         ctx['deadlines_template'] = deadlines_qs.filter(source='template')
         ctx['deadlines_manual'] = deadlines_qs.filter(source='manual')
-    return render(request, f'core/partials/fascicolo_tab_{tab}.html', ctx)
+    return render(request, f'core/partials/fascicolo/tab_{tab}.html', ctx)
 
 
 @login_required
 def activity_form_modal(request, pk):
     fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
-    return render(request, 'core/partials/activity_form_modal.html', {
+    return render(request, 'core/partials/fascicolo/activity_form_modal.html', {
         'fascicolo': fascicolo,
         'form': ActivityForm(),
     })
@@ -329,7 +329,7 @@ def activity_create(request, pk):
         activity.fascicolo = fascicolo
         activity.save()
         return HttpResponse(headers={'HX-Trigger': 'activityCreated'})
-    return render(request, 'core/partials/activity_form_modal.html', {
+    return render(request, 'core/partials/fascicolo/activity_form_modal.html', {
         'fascicolo': fascicolo,
         'form': form,
     })
@@ -380,7 +380,7 @@ def fascicolo_create(request):
 @login_required
 def deadline_form_modal(request, pk):
     fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
-    return render(request, 'core/partials/deadline_form_modal.html', {
+    return render(request, 'core/partials/fascicolo/deadline_form_modal.html', {
         'fascicolo': fascicolo,
         'form': DeadlineForm(),
     })
@@ -397,7 +397,7 @@ def deadline_create(request, pk):
         deadline.source = 'manual'
         deadline.save()
         return HttpResponse(headers={'HX-Trigger': 'deadlineChanged'})
-    return render(request, 'core/partials/deadline_form_modal.html', {
+    return render(request, 'core/partials/fascicolo/deadline_form_modal.html', {
         'fascicolo': fascicolo,
         'form': form,
     })
@@ -482,9 +482,9 @@ def scadenze(request):
     ctx = _scadenze_ctx(request)
     if request.htmx:
         template = (
-            'core/partials/scadenze_table.html'
+            'core/partials/scadenze/table.html'
             if request.htmx.target == 'scadenze-table'
-            else 'core/partials/scadenze_body.html'
+            else 'core/partials/scadenze/body.html'
         )
         return render(request, template, ctx)
     return render(request, 'core/scadenze.html', ctx)

@@ -54,7 +54,7 @@
 
   {# ── Left Panel — parties + metadata (never swapped by HTMX) ──────── #}
   <aside class="w-64 shrink-0 border-r border-base-200 self-stretch">
-    {% include "core/partials/fascicolo_left_panel.html" %}
+    {% include "core/partials/fascicoli/left_panel.html" %}
   </aside>
 
   {# ── Right Panel — tab strip + swappable tab content ─────────────── #}
@@ -119,7 +119,7 @@
 
     {# Tab content — replaced by HTMX on tab click #}
     <div id="fascicolo-tab-content" class="flex-1">
-      {% include "core/partials/fascicolo_tab_panoramica.html" %}
+      {% include "core/partials/fascicolo/tab_panoramica.html" %}
     </div>
 
   </div>

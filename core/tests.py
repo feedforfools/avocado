@@ -89,12 +89,12 @@ class ContactsViewTest(TestCase):
 
     def test_htmx_returns_partial(self):
         r = self.client.get('/contacts/', HTTP_HX_REQUEST='true', HTTP_HX_TARGET='contacts-body')
-        self.assertTemplateUsed(r, 'core/partials/contacts_body.html')
+        self.assertTemplateUsed(r, 'core/partials/contacts/body.html')
         self.assertNotContains(r, '<html')
 
     def test_htmx_table_target(self):
         r = self.client.get('/contacts/', HTTP_HX_REQUEST='true', HTTP_HX_TARGET='contacts-table')
-        self.assertTemplateUsed(r, 'core/partials/contacts_table.html')
+        self.assertTemplateUsed(r, 'core/partials/contacts/table.html')
 
     def test_unauthenticated_redirects(self):
         anon = HttpClient()
@@ -117,7 +117,7 @@ class ContactCreateTest(TestCase):
 
     def test_invalid_create_returns_form_with_errors(self):
         r = self.client.post('/contacts/create/', {'first_name': '', 'last_name': ''})
-        self.assertTemplateUsed(r, 'core/partials/contact_form_modal.html')
+        self.assertTemplateUsed(r, 'core/partials/contacts/form_modal.html')
         self.assertFalse(Contact.objects.exists())
 
 
@@ -138,7 +138,7 @@ class ContactEditTest(TestCase):
     def test_invalid_edit_returns_form_with_errors(self):
         c = _contact(self.user)
         r = self.client.post(f'/contacts/{c.pk}/edit/', {'first_name': '', 'last_name': ''})
-        self.assertTemplateUsed(r, 'core/partials/contact_form_modal.html')
+        self.assertTemplateUsed(r, 'core/partials/contacts/form_modal.html')
 
 
 class ContactToggleFavoriteTest(TestCase):
