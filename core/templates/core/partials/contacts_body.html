@@ -2,7 +2,7 @@
   x-data="{
     checked: [],
     total: {{ page_obj|length }},
-    columns: { name: true, role: true, address: true, phone: true, email: true },
+    columns: $persist({ name: true, role: true, address: true, phone: true, email: true }).as('columns_contacts'),
     columnsOpen: false,
     pendingColumns: {},
     openColumns() {

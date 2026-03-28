@@ -1,14 +1,14 @@
 <div x-data="{
     columnsOpen: false,
     pendingColumns: {},
-    columns: {
+    columns: $persist({
       label: true,
       fascicolo: true,
       proceeding_type: true,
       due_date: true,
       source: false,
       notes: false
-    },
+    }).as('columns_scadenze'),
     openColumns() {
       this.pendingColumns = { ...this.columns };
       this.columnsOpen = true;

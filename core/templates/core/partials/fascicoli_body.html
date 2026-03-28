@@ -1,10 +1,10 @@
 <div x-data="{
-    columns: {
+    columns: $persist({
       title: true, client: true, proceeding_type: true, prossima_scadenza: true,
       status: true, opened_date: true,
       rg_number: false, court: false, first_hearing_date: false,
       activities: false, scadenze: false, documents: false
-    },
+    }).as('columns_fascicoli'),
     columnsOpen: false,
     pendingColumns: {},
     openColumns() {
