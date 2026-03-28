@@ -18,6 +18,7 @@ from .fascicoli import (
     deadline_create,
     deadline_form_modal,
     deadline_toggle_complete,
+    _toggle_deadline,
 )
 from .scadenze import (
     scadenze,

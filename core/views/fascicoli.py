@@ -277,11 +277,16 @@ def deadline_create(request, pk):
     })
 
 
+def _toggle_deadline(deadline):
+    """Flip is_completed and persist. Shared by both toggle views."""
+    deadline.is_completed = not deadline.is_completed
+    deadline.save(update_fields=['is_completed', 'updated_at'])
+
+
 @login_required
 @require_POST
 def deadline_toggle_complete(request, pk, deadline_pk):
     fascicolo = get_object_or_404(Fascicolo, pk=pk, owner=request.user)
     deadline = get_object_or_404(Deadline, pk=deadline_pk, fascicolo=fascicolo)
-    deadline.is_completed = not deadline.is_completed
-    deadline.save(update_fields=['is_completed', 'updated_at'])
+    _toggle_deadline(deadline)
     return HttpResponse(headers={'HX-Trigger': 'deadlineChanged'})

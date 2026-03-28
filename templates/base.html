@@ -15,18 +15,12 @@
     <script defer src="https://unpkg.com/@alpinejs/persist@3.14.9/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.14.9/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script>
-      document.addEventListener('htmx:configRequest', function(event) {
-        const csrfToken = document.cookie.match(/csrftoken=([^;]+)/);
-        if (csrfToken) {
-          event.detail.headers['X-CSRFToken'] = csrfToken[1];
-        }
-      });
-    </script>
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 
-<body class="h-screen overflow-hidden bg-base-200" x-data="{ leftSidebarOpen: true, rightSidebarOpen: false }">
+<body class="h-screen overflow-hidden bg-base-200"
+      x-data="{ leftSidebarOpen: true, rightSidebarOpen: false }"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     {% include "partials/sidebar-left.html" %}
     {% include "partials/sidebar-right.html" %}
 

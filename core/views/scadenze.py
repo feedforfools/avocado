@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from ..models import Deadline
+from .fascicoli import _toggle_deadline
 
 
 _SCADENZE_SORT_FIELDS = {
@@ -89,6 +90,5 @@ def scadenze(request):
 def scadenza_toggle_complete(request, deadline_pk):
     """Toggle complete on a deadline from the standalone scadenze list."""
     deadline = get_object_or_404(Deadline, pk=deadline_pk, fascicolo__owner=request.user)
-    deadline.is_completed = not deadline.is_completed
-    deadline.save(update_fields=['is_completed', 'updated_at'])
+    _toggle_deadline(deadline)
     return HttpResponse(headers={'HX-Trigger': 'scadenzeChanged'})
