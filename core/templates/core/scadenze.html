@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Scadenze | {% endblock %}
+
+{% block foil_header %}
+<div class="flex w-full items-center gap-10">
+    <h1 class="text-lg font-bold">Scadenze</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="scadenze-body"
+     hx-get="{% url 'core:scadenze' %}"
+     hx-trigger="scadenzeChanged from:body"
+     hx-include="[name='q'],[name='tab'],[name='sort'],[name='sort_dir']"
+     hx-swap="innerHTML">
+    {% include "core/partials/scadenze_body.html" %}
+</div>
+{% endblock %}

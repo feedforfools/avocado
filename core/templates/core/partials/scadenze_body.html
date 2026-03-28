@@ -1,0 +1,28 @@
+<div x-data="{
+    columnsOpen: false,
+    pendingColumns: {},
+    columns: {
+      label: true,
+      fascicolo: true,
+      proceeding_type: true,
+      due_date: true,
+      source: false,
+      notes: false
+    },
+    openColumns() {
+      this.pendingColumns = { ...this.columns };
+      this.columnsOpen = true;
+    },
+    applyColumns() {
+      this.columns = { ...this.pendingColumns };
+      this.columnsOpen = false;
+    },
+    cancelColumns() {
+      this.columnsOpen = false;
+    }
+  }">
+  {% include "core/partials/scadenze_toolbar.html" %}
+  <div id="scadenze-table">
+    {% include "core/partials/scadenze_table.html" %}
+  </div>
+</div>
